@@ -56,7 +56,7 @@ UNDERLINE_3 = "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     #
 # DEBUG = False      # Capitalise convention for CONSTANTS
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
     #
     #########################################################################
     # Using a global variable to count handled errors is clunky but ...
@@ -121,7 +121,7 @@ def process_song_file(cursor, filepath):
         if (DEBUG == True):
             print(f'song_data tuple is: {song_data}')
         """
-        logging.debug(f'\n  song_data tuple is: {song_data}\n{UNDERLINE_3}')
+        logging.debug(f'\n  song_data tuple is: {song_data}')
 
     except:
         handled_errors += 1
@@ -141,7 +141,7 @@ def process_song_file(cursor, filepath):
             print("Song data record saved to database")
             print(f'{UNDERLINE_3}\n')
         """
-        logging.debug(f'\n  Song data record saved to database\n{UNDERLINE_3}')
+        logging.debug(f'\n  Song data record saved to database')
     except psycopg2.Error as e:
         handled_errors += 1
         """
@@ -161,7 +161,7 @@ def process_song_file(cursor, filepath):
         if (DEBUG == True):
             print(f'artist_data: {artist_data}')
         """
-        logging.debug(f'\n  artist_data tuple is: {artist_data}\n{UNDERLINE_3}')
+        logging.debug(f'\n  artist_data tuple is: {artist_data}')
     except:
         handled_errors += 1
         """
@@ -180,15 +180,15 @@ def process_song_file(cursor, filepath):
             print("Artist data record saved to database")
             print(f'{UNDERLINE_3}\n')
         """
-        logging.debug(f'\n  Artist data record saved to database\n{UNDERLINE_3}')
+        logging.debug(f'\n  Artist data record saved to database')
     except psycopg2.Error as e:
         handled_errors += 1
         """
         print(f'Error saving artist data record\n {e}')
         print(f'{UNDERLINE_1}\n')
         """
-        logging.debug(f'Error saving artist data record\n {e}')
-        logging.debug(f'{UNDERLINE_1}\n')
+        logging.error(f'Error saving artist data record\n {e}')
+        logging.error(f'{UNDERLINE_1}\n')
     """
     print('\n\nprocess_song_file complete')
     print(f'{UNDERLINE_1}\n{UNDERLINE_1}\n')
@@ -284,7 +284,7 @@ def process_log_file(cursor, filepath):
         # NOTE: This is placing quite a lot of data in memory, so perhaps expect problems
         #   if the log files are huge ...
         #
-    logging.info(f'\n  Filtering records where page == NextSong\n{UNDERLINE_3}')
+    log_string = (f'\n  Filtering records where page == NextSong\n')
     try:
         next_song_rows = dataframe.loc[dataframe["page"] == "NextSong"]
         """
@@ -296,14 +296,14 @@ def process_log_file(cursor, filepath):
             print('\n... (tail)')
             print(next_song_rows.tail())
         """
-        log_string = (f'\n  >>> File: {filepath}\n\n')
+        log_string += (f'\n  >>> File: {filepath}\n\n')
         log_string += (f'  >>> Rows where "page" = "NextSong": {len(next_song_rows.index)}\n\n')
         log_string += (f'  >>> Data fields (head):\n')
         log_string += (f'{next_song_rows.head()}\n\n')
         log_string += ('  >>> Data fields (tail)\n')
         log_string += (f'{next_song_rows.tail()}\n\n')
         log_string += (f'{UNDERLINE_3}')
-        logging.debug(log_string)
+        logging.info(log_string)
     except OSError as ose:
         handled_errors += 1
         """
@@ -339,7 +339,8 @@ def process_log_file(cursor, filepath):
         """
         print(f'Some other non-OSError occurred filtering rows in:\n{sys.exc_info()[0]}\n')
         """
-        logging.debug(f'Some other non-OSError occurred filtering rows in:\n{sys.exc_info()[0]}\n')
+        logging.error(f'Some other non-OSError occurred filtering rows in:\nYYY?\n')
+
             #############################################################################################
             # DEBUG --- Check for sensible looking user table data ...
             #
@@ -348,11 +349,11 @@ def process_log_file(cursor, filepath):
         for index, row in next_song_rows.iterrows():
             print(f'{index} --- User ID: {row["userId"]}, Name: {row["firstName"]} {row["lastName"]}, Gender: {row["gender"]}, Level: {row["level"]}')
     """
-    log_string = '\n  Extracting required data fields (for information ONLY):\n\n'
+    log_string = '\n  Extracting required data fields (for debugging ONLY):\n\n'
     for index, row in next_song_rows.iterrows():
         log_string += (f'{index} --- User ID: {row["userId"]}, Name: {row["firstName"]} {row["lastName"]}, Gender: {row["gender"]}, Level: {row["level"]}\n')
     log_string += (f'{UNDERLINE_3}')
-    logging.info(log_string)
+    logging.debug(log_string)
     """
     print(f'Done\n{UNDERLINE_3}\n\n')
     """
@@ -389,8 +390,7 @@ def process_log_file(cursor, filepath):
     print(f'{UNDERLINE_3}')
     print(f'Setting up a python list of python dictionaries for the time data ...')
     """
-    logging.debug(f'{UNDERLINE_3}')
-    logging.debug(f'Setting up a python list of python dictionaries for the time data ...')
+    log_string = (f'\n  Setting up a python list of python dictionaries for the time data ...\n')
         #############################################################################################
         #    (d1) - Set up a Python list to hold the time data records extracted from the file
         #
@@ -401,7 +401,8 @@ def process_log_file(cursor, filepath):
     """
     print(f'... extracting time data')
     """
-    logging.debug(f'... extracting time data')
+    log_string += (f'    ... extracting time data for each record\n\n')
+    loopcount = 0
     try:
         for index, row in dataframe.iterrows():
             as_datetime = pd.to_datetime(row["ts"], unit="ms")
@@ -430,23 +431,24 @@ def process_log_file(cursor, filepath):
                 #
             print(time_dict)
             """
-            log_string = (f'{UNDERLINE_3}\n')
-            log_string += (f'Time (in ms): {row["ts"]}')
-            log_string += (f'Start time: {time_dict["start_time"]}')
-            log_string += (f'Hour: {time_dict["hour"]}')
-            log_string += (f'Day: {time_dict["day"]}')
-            log_string += (f'Week number: {time_dict["week"]}')
-            log_string += (f'Month: {time_dict["month"]}')
-            log_string += (f'Year: {time_dict["year"]}')
-            log_string += (f'Weekday: {time_dict["weekday"]}')
-            log_string += (f'{UNDERLINE_3}\n')
+            log_string += (f'Time (in ms): {row["ts"]}  ')
+            log_string += (f'Start time: {time_dict["start_time"]}  ')
+            log_string += (f'Hour: {time_dict["hour"]}  ')
+            log_string += (f'Day: {time_dict["day"]}  ')
+            log_string += (f'Week number: {time_dict["week"]}  ')
+            log_string += (f'Month: {time_dict["month"]}  ')
+            log_string += (f'Year: {time_dict["year"]}  ')
+            log_string += (f'Weekday: {time_dict["weekday"]}  ')
+            log_string += (f'\n')
                 #
-            logging.debug(log_string)
-
+            loopcount += 1
                 #############################################################################################
                 #    (d4) - Append that to the timedata lisy
                 #
-        timedata_list.append(time_dict)
+            timedata_list.append(time_dict)  # Dangerous Python indentation ... easy to get this outside the loop!!
+        log_string += (f'\n  Number of records processed: {loopcount}')
+        log_string += (f'\n  Number of records added to timedata_list: {len(timedata_list)}')
+        logging.debug(f'{log_string}\n{UNDERLINE_3}')
     except:
         handled_errors += 1
         """
@@ -462,7 +464,7 @@ def process_log_file(cursor, filepath):
         if (DEBUG == True):
             print(f'\nTime data dataframe ...\n{time_dataframe}\n')
         """
-        logging.debug(f'\nTime data dataframe ...\n{time_dataframe}\n')
+        logging.debug(f'\nTime data dataframe ...\n{time_dataframe.to_string()}\n{UNDERLINE_3}')
     except:
         handled_errors += 1
         """
@@ -476,25 +478,28 @@ def process_log_file(cursor, filepath):
     """
     print(f'Inserting time data rows into database ...')
     """
-    logging.debug(f'Inserting time data rows into database ...')
+    loopcount = 0
+    log_string = (f'\n  Inserting time data rows into database ...\n\n')
     for i, row in time_dataframe.iterrows():
         try:
             """
             if (DEBUG == True):
                 print(f'(Time) Row {i} list(row) is: {list(row)}')
             """
-            logging.debug(f'(Time) Row {i} list(row) is: {list(row)}')
+            log_string += (f'(Time) Row {i} list(row) is: {list(row)}\n')
             cursor.execute(time_table_insert, list(row))
+            loopcount += 1
         except psycopg2.Error as e:
             handled_errors += 1
             """
             print(f'Error saving time data record\n {e}')
             """
+            logging.info(f'{log_string}\n\n  ... then an derror occurred:')
             logging.error(f'Error saving time data record\n {e}')
     """
     print(f'\nDone\n{UNDERLINE_3}\n\n')
     """
-    logging.debug(f'\nDone\n{UNDERLINE_3}\n\n')
+    logging.info(f'{log_string}\n\n   {loopcount} records added to the database\n{UNDERLINE_3}')
         #############################################################################################
         # Task #4: Populate User Table
         #############################################################################################
@@ -504,14 +509,14 @@ def process_log_file(cursor, filepath):
         #
         # WARNING!!! - This works using a csv file, but not with JSON ... shrug??
         #
-        # So, create a new user_dataframe from the original
+        # So, create a new user_dataframe from the next_song_rows dataframe
         #
     """
     print(f'Extracting a user-data frame\n\n')
     """
-    logging.debug(f'Extracting a user-data frame\n\n')
+    log_string = (f'\n  Extracting a user-data frame from file:\n')
     try:
-        user_dataframe = dataframe[['userId', 'firstName', 'lastName', 'gender', 'level']]
+        user_dataframe = next_song_rows[['userId', 'firstName', 'lastName', 'gender', 'level']]
         """
         if (True):
             print(f'File: \n {filepath}\n')
@@ -521,17 +526,14 @@ def process_log_file(cursor, filepath):
             print('\n... (tail)')
             print(user_dataframe.tail())
         """
-        log_string = (f'{UNDERLINE_3}\n')
-        log_string += (f'File: \n {filepath}\n')
-        log_string += (f'File: \n {filepath}\n')
-        log_string += (f'Number of lines read: {len(user_dataframe.index)}\n')
+        log_string += (f'    {filepath}\n\n')
+        log_string += (f'  Number of lines read: {len(user_dataframe.index)}\n\n')
         log_string += (f'User data fields (head):\n')
-        log_string += (user_dataframe.head())
-        log_string += ('\n... (tail)\n')
-        log_string += (user_dataframe.tail())
-        log_string += (f'{UNDERLINE_3}\n')
+        log_string += (f'{user_dataframe.head().to_string()}\n')
+        log_string += ('... (tail)\n')
+        log_string += (f'{user_dataframe.tail().to_string()}\n')
             #
-        logging.debug(debug_string)
+        logging.info(f'{log_string}\n\n{UNDERLINE_3}')
     except OSError as ose:
         handled_errors += 1
         """
@@ -567,37 +569,37 @@ def process_log_file(cursor, filepath):
         """
         print(f'Some other non-OSError occurred creating a sub-dataframe for users.\n{sys.exc_info()[0]}\n')
         """
-        logging.error(f'Some other non-OSError occurred creating a sub-dataframe for users.\n{sys.exc_info()[0]}\n')
+        logging.error(f'Some other non-OSError occurred creating a sub-dataframe for users.\n???\n')
             #
     """
     print(f'Done\n{UNDERLINE_3}\n\n')
     """
-    logging.debug(f'Done\n{UNDERLINE_3}\n\n')
         #############################################################################################
         # Insert user records once again using the iterrows method provided by pandas
         #
     """
     print(f'Inserting user data rows into database ...')
     """
-    logging.debug(f'Inserting user data rows into database ...')
+    log_string = (f'\n  Inserting user data rows into database ...\n\n')
     for i, row in user_dataframe.iterrows():
         try:
             """
             if (DEBUG = True):
                 print(f'(User) Row {i} list(row) is: {list(row)}')
             """
-            logging.debug(f'(User) Row {i} list(row) is: {list(row)}')
+            log_string += (f'(User) Row {i} list(row) is: {list(row)}\n')
             cursor.execute(user_table_insert, list(row))
         except psycopg2.Error as e:
             handled_errors += 1
             """
             print(f'Error saving user data record\n {e}')
             """
-            logging.debug(f'Error saving user data record\n {e}')
+            logging.info(f'{log_string}\n  ... just prior to error ...')
+            logging.error(f'Error saving user data record\n {e}')
     """
     print(f'\nDone\n{UNDERLINE_3}\n\n')
     """
-    logging.debug(f'\nDone\n{UNDERLINE_3}\n\n')
+    logging.info(f'{log_string}\n{UNDERLINE_3}\n')
 
         #############################################################################################
         # Task #5: Populate 'songplays' Table
@@ -613,7 +615,8 @@ def process_log_file(cursor, filepath):
         #############################################################################################
         # For each row in the dataframe (the dataframe derived from log files!!)
         #
-    for index, row in dataframe.iterrows():
+    log_string = (f'\n  Retrieving song and artist IDs using an SQL query ...\n\n')
+    for index, row in next_song_rows.iterrows():  # REMEBER it's the next_song_rows dataframe !!!
             #############################################################################################
             # Get songid and artistid from song and artist tables
             #
@@ -625,7 +628,7 @@ def process_log_file(cursor, filepath):
         """
         print(f'Song title: {row.song}, Artist ID {row.artist} => {cursor.fetchone()}')
         """
-        logging.debug(f'Song title: {row.song}, Artist ID {row.artist} => {cursor.fetchone()}')
+        log_string += (f'Song title: {row.song}, Artist ID {row.artist} => {cursor.fetchone()}\n')
         """
         results = cursor.fetchone()
 
@@ -644,12 +647,12 @@ def process_log_file(cursor, filepath):
     print('\n\nprocess_log_file complete')
     print(f'{UNDERLINE_1}\n')
     """
-    logging.debug('\n\nprocess_log_file complete')
-    logging.debug(f'{UNDERLINE_1}\n')
+    logging.info(f'{log_string}\n{UNDERLINE_3}')
+    logging.info(f'\n\nprocess_log_file complete\n{UNDERLINE_3}')
 
 def process_data(cursor, connection, filepath, func):
     global handled_errors
-    logging.info(f'\n  Entering process_data for path: {filepath} with: {func}\n{UNDERLINE_3}')
+    logging.info(f'\n  Entering process_data for path: {filepath} with: {func}')
         #############################################################################################
         # Get all files matching extension from directory using os and glob
         #

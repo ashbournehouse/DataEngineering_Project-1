@@ -88,7 +88,7 @@ time_table_insert = 'INSERT INTO time (start_time, hour, day, week, month, year,
 
 # FIND SONGS  (row.song, row.artist, row.length))
 
-song_select = 'SELECT songs.song_id, artists.artist_id FROM songs JOIN artists ON songs.artist_id = artists.artist_id;'
+song_select = 'SELECT songs.song_id, artists.artist_id FROM songs JOIN artists ON songs.artist_id = artists.artist_id WHERE title = (%s);'
 
 # QUERY LISTS
 

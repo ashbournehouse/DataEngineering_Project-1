@@ -21,8 +21,8 @@ from sql_queries import *
     #   statements to help understand what's going on as we develop code
     #
 UNDERLINE_1 = "===================================================================================================================="
-UNDERLINE_2 = "--------------------------------------------------------------------------------------------------------------------"
-UNDERLINE_3 = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+UNDERLINE_2 = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+UNDERLINE_3 = "--------------------------------------------------------------------------------------------------------------------"
     #########################################################################
     # LOGGING
     # =======
@@ -56,7 +56,7 @@ UNDERLINE_3 = "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     #
 # DEBUG = False      # Capitalise convention for CONSTANTS
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
     #
     #########################################################################
     # Using a global variable to count handled errors is clunky but ...
@@ -67,6 +67,8 @@ handled_errors = 0
 
 def process_song_file(cursor, filepath):
     global handled_errors
+    songs_saved_to_database = 0
+    artists_saved_to_database = 0
         #########################################################################
         # This processes one song file ... I think ...
         #
@@ -77,9 +79,9 @@ def process_song_file(cursor, filepath):
         #    per file, then it is necessary to specify typ='series'
         #
     """
-    print(f'Entering process_song_file for:\n {filepath}\n\n')
+    print(f'Entering process_song_file for:\n {os.path.basename(filepath)}\n\n')
     """
-    logging.info(f'\n  Entering process_song_file for:\n    {filepath}\n{UNDERLINE_3}')
+    logging.info(f'\n  Entering process_song_file for: {os.path.basename(filepath)}\n{UNDERLINE_3}')
     try:
         dataframe = pd.read_json(filepath, typ='series')
     except:
@@ -102,7 +104,7 @@ def process_song_file(cursor, filepath):
             #     so replace them with two quotes where they're likely to occur
             #
             #   NOTE c): rather than a string containing the field values
-            #     for the sng dat, we need to make a tuple, so use a cast
+            #     for the song_data, we need to make a tuple, so use a cast
             #
     try:
         song_fields = dataframe.to_numpy()
@@ -136,11 +138,7 @@ def process_song_file(cursor, filepath):
             #
     try:
         cursor.execute(song_table_insert, song_data)
-        """
-        if (DEBUG == True):
-            print("Song data record saved to database")
-            print(f'{UNDERLINE_3}\n')
-        """
+        songs_saved_to_database += 1
         logging.debug(f'\n  Song data record saved to database')
     except psycopg2.Error as e:
         handled_errors += 1
@@ -175,11 +173,7 @@ def process_song_file(cursor, filepath):
             #
     try:
         cursor.execute(artist_table_insert, artist_data)
-        """
-        if (DEBUG == True):
-            print("Artist data record saved to database")
-            print(f'{UNDERLINE_3}\n')
-        """
+        artists_saved_to_database += 1
         logging.debug(f'\n  Artist data record saved to database')
     except psycopg2.Error as e:
         handled_errors += 1
@@ -191,9 +185,10 @@ def process_song_file(cursor, filepath):
         logging.error(f'{UNDERLINE_1}\n')
     """
     print('\n\nprocess_song_file complete')
-    print(f'{UNDERLINE_1}\n{UNDERLINE_1}\n')
+    print(f'{UND
+    ERLINE_1}\n{UNDERLINE_1}\n')
     """
-    logging.debug(f'\n  process_song_file complete\n{UNDERLINE_3}')
+    logging.info(f'\n  process_song_file complete\n  Sonds saved to database: {songs_saved_to_database}\n  Artists saved to database: {artists_saved_to_database}\n{UNDERLINE_3}')
 
 def process_log_file(cursor, filepath):
     global handled_errors
@@ -212,22 +207,22 @@ def process_log_file(cursor, filepath):
         #
         #
     """
-    print(f'Entering process_log_file for:\n {filepath}\n\n')
+    print(f'Entering process_log_file for:\n {os.path.basename(filepath)}\n\n')
     print(f'Reading log file\n')
     """
-    logging.info(f'\n  Entering process_log_file for:\n {filepath}\n\n  >>>Reading log file\n{UNDERLINE_3}')
+    logging.info(f'\n  Entering process_log_file for: {os.path.basename(filepath)}\n{UNDERLINE_3}')
     try:
         dataframe = pd.read_json(filepath, lines=True)  #... works for a multi-line JSON data file ...?
         """
         if (DEBUG == True):
-            print(f'File: \n {filepath}\n')
+            print(f'File: \n {os.path.basename(filepath)}\n')
             print(f'Number of lines read: {len(dataframe.index)}\n')
             print(f'Data fields (head):\n')
             print(dataframe.head())
             print('\n... (tail)')
             print(dataframe.tail())
         """
-        log_string = (f'\n  >>> File: {filepath}\n\n')
+        log_string = (f'\n  >>> File: {os.path.basename(filepath)}\n\n')
         log_string += (f'  >>> Number of lines read: {len(dataframe.index)}\n\n')
         log_string += (f'  >>> Data fields (head):\n')
         log_string += (f'{dataframe.head()}\n\n')
@@ -241,31 +236,31 @@ def process_log_file(cursor, filepath):
     except OSError as ose:
         handled_errors += 1
         """
-        print(f'Something went wrong converting the file to a dataframe:\n {filepath}')
+        print(f'Something went wrong converting the file to a dataframe:\n {os.path.basename(filepath)}')
         print(f'OS returned:\n\n{ose}\n\n')
         print(UNDERLINE_1)
         """
-        logging.error(f'Something went wrong converting the file to a dataframe:\n {filepath}')
+        logging.error(f'Something went wrong converting the file to a dataframe:\n {os.path.basename(filepath)}')
         logging.error(f'OS returned:\n\n{ose}\n\n')
         logging.error(UNDERLINE_1)
     except ValueError as ve:
         handled_errors += 1
         """
-        print(f'A ValueError occurred converting the file to a dataframe:\n {filepath}')
+        print(f'A ValueError occurred converting the file to a dataframe:\n {os.path.basename(filepath)}')
         print(f'Error message is:\n\n{ve}\n\n')
         print(UNDERLINE_1)
         """
-        logging.error(f'A ValueError occurred converting the file to a dataframe:\n {filepath}')
+        logging.error(f'A ValueError occurred converting the file to a dataframe:\n {os.path.basename(filepath)}')
         logging.error(f'Error message is:\n\n{ve}\n\n')
         logging.error(UNDERLINE_1)
     except NameError as ne:
         handled_errors += 1
         """
-        print(f'A NameError occurred converting the file to a dataframe:\n {filepath}')
+        print(f'A NameError occurred converting the file to a dataframe:\n {os.path.basename(filepath)}')
         print(f'Error message is:\n\n{ve}\n\n')
         print(UNDERLINE_1)
         """
-        logging.error(f'A NameError occurred converting the file to a dataframe:\n {filepath}')
+        logging.error(f'A NameError occurred converting the file to a dataframe:\n {os.path.basename(filepath)}')
         logging.error(f'Error message is:\n\n{ve}\n\n')
         logging.error(UNDERLINE_1)
     except:
@@ -289,49 +284,49 @@ def process_log_file(cursor, filepath):
         next_song_rows = dataframe.loc[dataframe["page"] == "NextSong"]
         """
         if (DEBUG == True):
-            print(f'File: \n {filepath}\n')
+            print(f'File: \n {os.path.basename(filepath)}\n')
             print(f'Rows where "page" = "NextSong": {len(next_song_rows.index)}\n')
             print(f'Data fields (head):\n')
             print(next_song_rows.head())
             print('\n... (tail)')
             print(next_song_rows.tail())
         """
-        log_string += (f'\n  >>> File: {filepath}\n\n')
-        log_string += (f'  >>> Rows where "page" = "NextSong": {len(next_song_rows.index)}\n\n')
-        log_string += (f'  >>> Data fields (head):\n')
+        log_string += (f'\n  File: {os.path.basename(filepath)}\n\n')
+        log_string += (f'  Rows where "page" = "NextSong": {len(next_song_rows.index)}\n\n')
+        log_string += (f'  Data fields (head):\n')
         log_string += (f'{next_song_rows.head()}\n\n')
-        log_string += ('  >>> Data fields (tail)\n')
+        log_string += ('  Data fields (tail)\n')
         log_string += (f'{next_song_rows.tail()}\n\n')
         log_string += (f'{UNDERLINE_3}')
         logging.info(log_string)
     except OSError as ose:
         handled_errors += 1
         """
-        print(f'Something went wrong filtering rows in:\n {filepath}')
+        print(f'Something went wrong filtering rows in:\n {os.path.basename(filepath)}')
         print(f'OS returned:\n\n{ose}\n\n')
         print(UNDERLINE_1)
         """
-        logging.error(f'Something went wrong filtering rows in:\n {filepath}')
+        logging.error(f'Something went wrong filtering rows in:\n {os.path.basename(filepath)}')
         logging.error(f'OS returned:\n\n{ose}\n\n')
         logging.error(UNDERLINE_1)
     except ValueError as ve:
         handled_errors += 1
         """
-        print(f'A ValueError occurred filtering rows in:\n {filepath}')
+        print(f'A ValueError occurred filtering rows in:\n {os.path.basename(filepath)}')
         print(f'Error message is:\n\n{ve}\n\n')
         print(UNDERLINE_1)
         """
-        logging.error(f'A ValueError occurred filtering rows in:\n {filepath}')
+        logging.error(f'A ValueError occurred filtering rows in:\n {os.path.basename(filepath)}')
         logging.error(f'Error message is:\n\n{ve}\n\n')
         logging.error(UNDERLINE_1)
     except NameError as ne:
         handled_errors += 1
         """
-        print(f'A NameError occurred filtering rows in:\n {filepath}')
+        print(f'A NameError occurred filtering rows in:\n {os.path.basename(filepath)}')
         print(f'Error message is:\n\n{ne}\n\n')
         print(UNDERLINE_1)
         """
-        logging.error(f'A NameError occurred filtering rows in:\n {filepath}')
+        logging.error(f'A NameError occurred filtering rows in:\n {os.path.basename(filepath)}')
         logging.error(f'Error message is:\n\n{ne}\n\n')
         logging.error(UNDERLINE_1)
     except:
@@ -510,27 +505,27 @@ def process_log_file(cursor, filepath):
         # WARNING!!! - This works using a csv file, but not with JSON ... shrug??
         #
         # So, create a new user_dataframe from the next_song_rows dataframe
+        #    NOTE: You need to be logged in to request a next-song, so we'll still get all the users.
         #
     """
     print(f'Extracting a user-data frame\n\n')
     """
-    log_string = (f'\n  Extracting a user-data frame from file:\n')
+    log_string = (f'\n  Extracting a user-dataframe from file: {os.path.basename(filepath)}\n\n')
     try:
         user_dataframe = next_song_rows[['userId', 'firstName', 'lastName', 'gender', 'level']]
         """
         if (True):
-            print(f'File: \n {filepath}\n')
+            print(f'File: \n {os.path.basename(filepath)}\n')
             print(f'Number of lines read: {len(user_dataframe.index)}\n')
             print(f'User data fields (head):\n')
             print(user_dataframe.head())
             print('\n... (tail)')
             print(user_dataframe.tail())
         """
-        log_string += (f'    {filepath}\n\n')
         log_string += (f'  Number of lines read: {len(user_dataframe.index)}\n\n')
         log_string += (f'User data fields (head):\n')
         log_string += (f'{user_dataframe.head().to_string()}\n')
-        log_string += ('... (tail)\n')
+        log_string += ('User data fields (tail)\n')
         log_string += (f'{user_dataframe.tail().to_string()}\n')
             #
         logging.info(f'{log_string}\n\n{UNDERLINE_3}')
@@ -615,20 +610,28 @@ def process_log_file(cursor, filepath):
         #############################################################################################
         # For each row in the dataframe (the dataframe derived from log files!!)
         #
+    logging.info(f'Select all songs, just to make sure that there are some ...')
+    cursor.execute("SELECT song_id, title FROM songs")
+    for row in cursor:
+        logging.info(f'{cursor.fetchone()}\n')
+    logging.info(f'{UNDERLINE_2}')
     log_string = (f'\n  Retrieving song and artist IDs using an SQL query ...\n\n')
-    for index, row in next_song_rows.iterrows():  # REMEBER it's the next_song_rows dataframe !!!
+    for index, row in next_song_rows.iterrows():  # REMEMBER it's the next_song_rows dataframe !!!
             #############################################################################################
             # Get songid and artistid from song and artist tables
             #
             #   Remeber: song_select = 'SELECT song_id, artist_id FROM songs JOIN artists ON artist_id
             #                                              WHERE (title = %s, name = %s, duration = %s);'
             #
-        #cursor.execute(song_select, (row.song, row.artist, row.length))
-        cursor.execute(song_select)
-        """
+        query_values = tuple([row.song])
+        logging.debug(f'Composed SQL query is: {cursor.mogrify(song_select, query_values)}')
+        cursor.execute(song_select, query_values)
+        '''
         print(f'Song title: {row.song}, Artist ID {row.artist} => {cursor.fetchone()}')
-        """
-        log_string += (f'Song title: {row.song}, Artist ID {row.artist} => {cursor.fetchone()}\n')
+        '''
+        test = cursor.fetchone()
+        if (test is not None):
+            log_string += (f'Song title: {row.song}, Artist ID {row.artist} => {test}\n')
         """
         results = cursor.fetchone()
 
@@ -648,11 +651,12 @@ def process_log_file(cursor, filepath):
     print(f'{UNDERLINE_1}\n')
     """
     logging.info(f'{log_string}\n{UNDERLINE_3}')
-    logging.info(f'\n\nprocess_log_file complete\n{UNDERLINE_3}')
+    logging.info(f'\nprocess_log_file complete for file: {os.path.basename(filepath)} \n{UNDERLINE_3}')
 
 def process_data(cursor, connection, filepath, func):
     global handled_errors
     logging.info(f'\n  Entering process_data for path: {filepath} with: {func}')
+    logging.debug(f'\n  Absolute path is:\n  {os.path.abspath(filepath)}')
         #############################################################################################
         # Get all files matching extension from directory using os and glob
         #
@@ -667,24 +671,23 @@ def process_data(cursor, connection, filepath, func):
     num_files = len(all_files)
     """
     if DEBUG == True:
-        print(f'{num_files} files found in {filepath}')
+        print(f'{num_files} files found in {os.path.basename(filepath)}')
         print(f'{UNDERLINE_1}\n')
     """
-    logging.info(f'\n  {num_files} files found in path: {filepath}\n{UNDERLINE_2}')
+    logging.info(f'\n  {num_files} files found in path: {os.path.basename(filepath)}\n{UNDERLINE_2}')
 
         #############################################################################################
         # iterate over files and process
         #
     for i, datafile in enumerate(all_files, 1):
         func(cursor, datafile)
-        connection.commit()
         """
         if DEBUG == True:
             print(f'{i}/{num_files} files processed.')
             logging.debug(f'{UNDERLINE_1}\n')
         """
         logging.info(f'\n  {i}/{num_files} files processed.\n{UNDERLINE_2}')
-    logging.info(f'\n  Leaving process_data for path: {filepath} with: {func}\n{UNDERLINE_1}')
+    logging.info(f'\n  Leaving process_data for path: {os.path.basename(filepath)} with: {func}\n{UNDERLINE_1}')
 
 def main():
     global handled_errors
@@ -700,6 +703,7 @@ def main():
         #
     try:
         sparkify_connection = psycopg2.connect("host=127.0.0.1 dbname=sparkify user=ajb password=hsc1857")
+        sparkify_connection.set_session(autocommit=True)
         """
         print(f'Connection open\n{sparkify_connection}\n\n')
         """
@@ -734,10 +738,26 @@ def main():
           #############################################################################################
           # Specify the root path for the song data files
           #
-
-    process_data(sparkify_cursor, sparkify_connection, filepath='data/song_data', func=process_song_file)
-    process_data(sparkify_cursor, sparkify_connection, filepath='data/log_data', func=process_log_file)
-
+    song_datapath = 'data/song_data'
+    process_data(sparkify_cursor, sparkify_connection, filepath=song_datapath, func=process_song_file)
+    try:
+        sql = 'SELECT count(*) from songs'
+        sparkify_cursor.execute(sql)
+        logging.info(f'Number of songs in the database: {sparkify_cursor.fetchone()}')
+    except psycopg2.Error as e:
+        logging.error(f'Something went wrong while trying to test the the number of song records\n  {e}')
+    try:
+        sql = 'SELECT count(*) from artists'
+        sparkify_cursor.execute(sql)
+        logging.info(f'Number of artists in the database: {sparkify_cursor.fetchone()}')
+    except psycopg2.Error as e:
+        logging.error(f'Something went wrong while trying to test the the number of artist records\n  {e}')
+    logging.info(f'{UNDERLINE_1}')
+          #############################################################################################
+          # Specify the root path for the log data files
+          #
+    logs_datapath = 'data/log_data'
+    process_data(sparkify_cursor, sparkify_connection, filepath=logs_datapath, func=process_log_file)
         #############################################################################################
         #
         # Do a clean shutdown of the cursor and connection

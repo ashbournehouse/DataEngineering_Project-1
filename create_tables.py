@@ -1,151 +1,275 @@
+########################################################################
+# 21/05/2021 - This script kills and rebuilds the tables required
+#   by Udacity Data Engineering - Project 1 'Modeling in Postgres'
+#
+########################################################################
+    #
+    ####################################################################
+    # Imports
+    #
 import psycopg2
 from sql_queries import create_table_queries, drop_table_queries
 
-UNDERLINE_1 = "--------------------------------------------------------------------------------------------------------------------"
-UNDERLINE_2 = "===================================================================================================================="
-
+UNDERLINE_1 = "========================================================"
+UNDERLINE_2 = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+UNDERLINE_3 = "--------------------------------------------------------"
+    ####################################################################
+    # Basic logger setup
+    #
+import logging
+logging.basicConfig(level=logging.INFO)
+    ####################################################################
+    # Create database
+    #
 def create_database():
-        #############################################################################################
+        ################################################################
         # Create and connect to the sparkifydb
         # Returns the connection and cursor to sparkifydb
-        #############################################################################################
+        ################################################################
         # Create a connection to postgreSQL
         #
     try:
-        admin_connection = psycopg2.connect("host=127.0.0.1 dbname=ajb_test user=ajb password=hsc1857")
-        print(f'Connection open\n{admin_connection}\n\n')
+        admin_connection = psycopg2.connect(
+            'host=127.0.0.1 dbname=ajb_test user=ajb password=hsc1857'
+            )
+        logging.info(
+            f'\n'
+            f'  Connection open:\n'
+            f'    {admin_connection}\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error trying to open connection\n {admin_connection}')   # NOTE: the use of string interpolation; 'f-strings' in Python
-        print(e)
-        print(f'{UNDERLINE_1}\n')
-            #############################################################################################
-            # Set auto-commit for this connection
-            #
+        logging.error(
+            f'\n'
+            f'  Error trying to open connection:\n'
+            f'{admin_connection}\n'
+            f'{UNDERLINE_2}'
+            )
+#23456789_123456789_123456789_123456789_123456789_123456789_123456789_12
+        ################################################################
+        # Set auto-commit for this connection
+        #
     try:
         admin_connection.set_session(autocommit=True)
-        print(f'Auto-commit active\n')
+        logging.info(
+            f'\n'
+            f'  Auto-commit active\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error setting auto-commit on connection\n {admin_connection}')
-        print(f'{UNDERLINE_1}\n')
-            #############################################################################################
-            # Use that conection to get a 'cursor' that can be used to execute queries
-            #
+        logging.error(
+            f'\n'
+            f'  Error setting auto-commit on connection:\n'
+            f'{admin_connection}\n'
+            f'  Error returned by psycopg2:\n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+        ################################################################
+        # Use that conection to get a 'cursor' that can be used to
+        #   execute queries
+        #
     try:
         cursor = admin_connection.cursor()
-        print("Cursor active\n")
+        logging.info(
+            f'\n'
+            f'  Cursor active\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error obtaining a cursor on connection\n {admin_connection}')
-        print(e)
-            #############################################################################################
-            # drop and create sparkify database with UTF8 encoding
+        logging.error(
+            f'\n'
+            f'  Error obtaining a cursor on connection:\n'
+            f'    {admin_connection}\n'
+            f'  Error returned by psycopg2:\n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+#23456789_123456789_123456789_123456789_123456789_123456789_123456789_12
+            ############################################################
+            # Drop and create sparkify database with UTF8 encoding
             #
     database_name = 'sparkify'
     sql = f'DROP DATABASE IF EXISTS {database_name}'
     try:
         cursor.execute(f'{sql}')
-        print(f'Database {database_name} dropped successfully')
-        print(f'{UNDERLINE_2}\n')
+        logging.info(
+            f'\n'
+            f'  Database {database_name} dropped successfully\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error executing query\n {sql}')
-        print(e)
-        print(f'{UNDERLINE_1}\n')
-    sql = f"CREATE DATABASE {database_name} WITH ENCODING 'utf8' TEMPLATE template0"
+        logging.error(
+            f'\n'
+            f'  Error executing query\n'
+            f'    {sql}\n'
+            f'  Error returned by psycopg2:\n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+            ############################################################
+            # Create the sparkify database
+            #
+    sql = (
+            f'CREATE DATABASE {database_name}'
+            f' WITH ENCODING \'utf8\' TEMPLATE template0'
+            )
     try:
         cursor.execute(f'{sql}')
-        print(f'Database {database_name} created successfully')
-        print(f'{UNDERLINE_2}\n')
+        logging.info(
+            f'\n'
+            f'  Database {database_name} created successfully\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error executing query\n {sql}')
-        print(e)
-        print(f'{UNDERLINE_1}\n')
-            #############################################################################################
-            # close connection to default database
-            #
+        logging.error(
+            f'\n'
+            f'  Error executing query\n'
+            f'    {sql}\n'
+            f'  Error returned by psycopg2:\n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+        ################################################################
+        # close connection to default database
+        #
     admin_connection.close()
-        #############################################################################################
+        ################################################################
         # Create a connection to 'sparkify' database
         #
     try:
-        sparkify_connection = psycopg2.connect("host=127.0.0.1 dbname=sparkify user=ajb password=hsc1857")
-        print(f'Connection open\n{sparkify_connection}\n\n')
+        sparkify_connection = psycopg2.connect(
+            'host=127.0.0.1 dbname=sparkify user=ajb password=hsc1857'
+            )
+        logging.info(
+            f'\n'
+            f'  Connection open:\n'
+            f'    {sparkify_connection}\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error trying to open connection\n {sparkify_connection}')
-        print(e)
-        print(f'{UNDERLINE_1}\n')
-            #############################################################################################
-            # Use that conection to get a 'cursor' that can be used to execute queries
-            #
+        logging.error(
+            f'\n'
+            f'  Error trying to open connection:\n'
+            f'    {sparkify_connection}\n'
+            f'  Error returned by psycopg2:\n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+#23456789_123456789_123456789_123456789_123456789_123456789_123456789_12
+        ################################################################
+        # Use that conection to get a 'cursor' that can be used to
+        #   execute queries
+        #
     try:
         sparkify_cursor = sparkify_connection.cursor()
-        print("Sparkify cursor active\n")
+        logging.info(
+            f'\n'
+            f'  Sparkify cursor active\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error obtaining a cursor on connection\n {sparkify_connection}')
-        print(e)
-            #############################################################################################
-            # EMERGENCY close all pids where something has gone wrong!!!
-            #
-        #sql = "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='sparkify';"
-        #sparkify_cursor.execute(sql)
-            #############################################################################################
-            # set return values
-            #
+        logging.error(
+            f'\n'
+            f'  Error obtaining a cursor on connection:\n'
+            f'    {sparkify_connection}\n'
+            f'  Error returned by psycopg2:\n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+        ################################################################
+        # EMERGENCY close all pids where something has gone wrong!!!
+        #
+    #sql = f'SELECT pg_terminate_backend(pid) '
+    #       f'FROM pg_stat_activity WHERE '
+    #       f'datname=\'sparkify\';'
+    #sparkify_cursor.execute(sql)
+        ################################################################
+        # set return values
+        #
     return sparkify_cursor, sparkify_connection
 
 
 def drop_tables(cursor, connecction):
-        #############################################################################################
-        # Drop all tables using the queries in `drop_table_queries` list.
-        #############################################################################################
+        ################################################################
+        # Drop all tables using the queries in `drop_table_queries`
+        #   list.
+        #
     for query in drop_table_queries:
         cursor.execute(query)
         connecction.commit()
 
 def create_tables(cursor, connecction):
-        #############################################################################################
-        # Creates all required the tables using the queries in `create_table_queries` list.
-        #############################################################################################
+        ################################################################
+        # Creates all required the tables using the queries in
+        #   `create_table_queries` list.
+        #
     for query in create_table_queries:
         cursor.execute(query)
         connecction.commit()
 
 def main():
-    print("\nWe're at the beginning ...\n\n")
-        #############################################################################################
-        # Drops (if it exists) and creates the sparkify database.
-        # Establishes connection with the sparkify database and get cursor to it.
-        #############################################################################################
+    logging.warning(
+        f'\n'
+        f'  We\'re at the beginning ...\n'
+        f'{UNDERLINE_3}'
+        )
+        ################################################################
+        # Drops (if it exists) and creates the sparkify database, then
+        #   establishes connection with the sparkify database and
+        #   gets a cursor to it.
+        #
     sparkify_cursor, sparkify_connection = create_database()
-        #############################################################################################
+        ################################################################
         # Drop all the tables.
-        #############################################################################################
+        #
     drop_tables(sparkify_cursor, sparkify_connection)
-        #############################################################################################
+        ################################################################
         # Creates all tables needed.
-        #############################################################################################
+        #
     create_tables(sparkify_cursor, sparkify_connection)
-        #############################################################################################
+        ################################################################
         #
         # Do a clean shutdown of the cursor and connection
         #
     try:
         sparkify_cursor.close()
-        print("Cursor closed")
+        logging.info(
+            f'\n'
+            f'  Cursor closed\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error when trying to close the cursor\n')
-        print(e)
-        print(f'{UNDERLINE_1}\n')
-            #
-            # Close the connection
-            #
+        logging.error(
+            f'\n'
+            f'  Error when trying to close the cursor\n'
+            f'  Error returned by psycopg2:\n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+        ################################################################
+        # Close the connection
+        #
     try:
         sparkify_connection.close()
-        print("Connection closed\n")
+        logging.info(
+            f'\n'
+            f'  Connection closed\n'
+            f'{UNDERLINE_3}'
+            )
     except psycopg2.Error as e:
-        print(f'Error when trying to close the connection\n')
-        print(e)
-        print(f'{UNDERLINE_1}\n')
-
-    print("We've got to the end!!\n\n")
+        logging.error(
+            f'\n'
+            f'  Error when trying to close the connection\n'
+            f'  Error returned by psycopg2:\n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+    logging.warning(
+        f'\n'
+        f'  We\'ve got to the end!!\n\n'
+        f'{UNDERLINE_1}\n\n'
+        )
 
 if __name__ == "__main__":
     main()

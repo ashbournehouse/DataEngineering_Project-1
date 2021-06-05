@@ -176,11 +176,18 @@ def process_song_file(cursor, filepath):
         handled_errors += 1
         logging.error(
             f'\n'
-            f'Something went wrong building the artist_data string\n'
+            f'Something went wrong building the artist_data tuple\n'
             f'{UNDERLINE_1}')
         ############################################################
         # With everything prepared, insert the artist data into
         #   the database.
+        #
+        # QUESTION:
+        # =========
+        #   Do we want duplicates in the artists table?
+        #
+        #   If the answer is no, then check to see if an artist
+        #     already exists in the artists table.
         #
     try:
         cursor.execute(artist_table_insert, artist_data)
@@ -235,10 +242,9 @@ def process_log_file(cursor, filepath):
             f'Data fields (tail)\n'
             f'{dataframe.tail()}\n\n'
             f'{UNDERLINE_3}')
-#23456789_123456789_123456789_123456789_123456789_123456789_123456789_12
-           #############################################################
-            # This error handling might be better spun out to a function
-            #
+       #################################################################
+        # This error handling might be better spun out to a function
+        #
     except OSError as ose:
         handled_errors += 1
         logging.error(
@@ -519,8 +525,15 @@ def process_log_file(cursor, filepath):
         #          we'll still get all the users.
         #
     try:
-        user_dataframe = next_song_rows[['userId', 'firstName',
-                                    'lastName', 'gender', 'level']]
+        #user_dataframe = next_song_rows[['userId', 'firstName', 'lastName', 'gender', 'level']]
+            ############################################################
+            # If we don't want duplicate user records in the database!
+            #
+            # NOTE: This will only stop us creating duplicate user
+            #   records from a given file. We need a constraint on the
+            #   database when we create it fully to prevent duplicates.
+            #
+        user_dataframe = next_song_rows[['userId', 'firstName', 'lastName', 'gender', 'level']].drop_duplicates(subset=['userId'])
         logging.info (
             f'\n'
             f'  Extracting a user-dataframe from file: '
@@ -532,7 +545,6 @@ def process_log_file(cursor, filepath):
             f'{user_dataframe.tail().to_string()}\n\n'
             f'{UNDERLINE_3}'
             )
-#23456789_123456789_123456789_123456789_123456789_123456789_123456789_12
     except OSError as ose:
         handled_errors += 1
         logging.error(
@@ -731,7 +743,6 @@ def main():
             # Create a connection to postgreSQL
             #
     try:
-#23456789_123456789_123456789_123456789_123456789_123456789_123456789_12
         sparkify_connection = psycopg2.connect(
             'host=127.0.0.1 dbname=studentdb user=student password=student'
             )
@@ -747,7 +758,7 @@ def main():
             f'\n'
             f'  Error trying to open connection:\n'
             f'    {sparkify_connection}\n\n'
-            f'  Error raied is: \n'
+            f'  Error raised is: \n'
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
@@ -757,20 +768,27 @@ def main():
         #
     try:
         sparkify_cursor = sparkify_connection.cursor()
-        logging.info(f'\n  Sparkify cursor active\n{UNDERLINE_1}')
+        logging.info(
+            f'\n'
+            f'  Sparkify cursor active\n'
+            f'{UNDERLINE_1}'
+            )
     except psycopg2.Error as e:
         handled_errors += 1
         logging.error(
             f'\n'
             f'  Error obtaining a cursor on connection:\n'
             f'    {sparkify_connection}\n\n'
-            f'  Error raied is: \n'
+            f'  Error raised is: \n'
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
-          ##############################################################
-          # Specify the root path for the song data files
-          #
+        ################################################################
+        # TASKS #1 & #2
+        # =============
+        #   Process song datafiles and populate songs table and
+        #     artists table.
+        #
     song_datapath = 'data/song_data'
     process_data(sparkify_cursor,
         sparkify_connection,
@@ -791,7 +809,7 @@ def main():
             f'\n'
             f'  Something went wrong while trying to test the the '
             f'number of song records\n'
-            f'  Error raied is: \n'
+            f'  Error raised is: \n'
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
@@ -809,20 +827,23 @@ def main():
             f'\n'
             f'  Something went wrong while trying to test the '
             f'number of artist records\n'
-            f'  Error raied is: \n'
+            f'  Error raised is: \n'
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
-          ##############################################################
-          # Specify the root path for the log data files
-          #
+        ################################################################
+        # TASKS #3, #4 & #5
+        # =================
+        #   Process log datafiles and populate time table, users table
+        #     and songplays table.
+        #
     logs_datapath = 'data/log_data'
     process_data(sparkify_cursor,
         sparkify_connection,
         filepath=logs_datapath,
         func=process_log_file
         )
-       #################################################################
+        #################################################################
         #
         # Do a clean shutdown of the cursor and connection
         #
@@ -838,7 +859,7 @@ def main():
         logging.error(
             f'\n'
             f'  Error when trying to close the cursor\n'
-            f'  Error raied is: \n'
+            f'  Error raised is: \n'
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
@@ -857,7 +878,7 @@ def main():
         logging.error(
             f'\n'
             f'  Error when trying to close the connection\n'
-            f'  Error raied is: \n'
+            f'  Error raised is: \n'
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )

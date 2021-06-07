@@ -1,5 +1,3 @@
-#23456789_123456789_123456789_123456789_123456789_123456789_123456789_12
-	#
 	######################################################################
 	# DROP TABLES
 	# ===========
@@ -9,7 +7,9 @@ user_table_drop = f'DROP TABLE IF EXISTS users'
 song_table_drop = f'DROP TABLE IF EXISTS songs'
 artist_table_drop = f'DROP TABLE IF EXISTS artists'
 time_table_drop = f'DROP TABLE IF EXISTS time'
-	#
+
+
+
 	######################################################################
 	# CREATE TABLES
 	# =============
@@ -23,86 +23,83 @@ time_table_drop = f'DROP TABLE IF EXISTS time'
 	# 01 - Table 'songplays' has fields: songplay_id, start_time,
 	#     user_id, level, song_id, artist_id, session_id, location,
 	#     user_agent
-	#
-songplay_fields = ''
-songplay_fields = songplay_fields + 'songplay_id int UNIQUE, '
-songplay_fields = songplay_fields + 'start_time timestamp, '
-songplay_fields = songplay_fields + 'user_id int, '
-songplay_fields = songplay_fields + 'level varchar, '
-songplay_fields = songplay_fields + 'song_id varchar, '
-songplay_fields = songplay_fields + 'artist_id varchar, '
-songplay_fields = songplay_fields + 'session_id int, '
-songplay_fields = songplay_fields + 'location varchar, '
-songplay_fields = songplay_fields + 'user_agent text'
-	#
-songplay_table_create = (f'CREATE TABLE IF NOT EXISTS songplays'
-												f' ({songplay_fields})')
-	#
+
+songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays'
+                            '(songplay_id int UNIQUE, '
+                            'start_time timestamp, '
+                            'user_id int, '
+                            'level varchar, '
+                            'song_id varchar, '
+                            'artist_id varchar, '
+                            'session_id int, '
+                            'location varchar, '
+                            'user_agent text)'
+                            )
+
 	######################################################################
 	# 02 - Table 'users' has fields: user_id, first_name, last_name,
 	#     gender, level
 	#
-user_fields = ''
-user_fields = user_fields + 'user_id int UNIQUE, '
-user_fields = user_fields + 'first_name varchar, '
-user_fields = user_fields + 'last_name varchar, '
-user_fields = user_fields + 'gender varchar, '
-user_fields = user_fields + 'level varchar'
-	#
-user_table_create = (f'CREATE TABLE IF NOT EXISTS users'
-                    f' ({user_fields})')
-	#
+
+user_table_create = ('CREATE TABLE IF NOT EXISTS users'
+                        '(user_id int UNIQUE, '
+                        'first_name varchar, '
+                        'last_name varchar, '
+                        'gender varchar, '
+                        'level varchar)'
+                        )
+
 	######################################################################
 	# 03 - Table 'songs' has fields: song_id, title, artist_id, year,
 	#     duration
 	#
 	#   NOTE: use of NUMERIC(precision, scale)
 	#
-song_fields = ''
-song_fields = song_fields + 'song_id varchar UNIQUE, '
-song_fields = song_fields + 'title varchar, '
-song_fields = song_fields + 'artist_id varchar, '
-song_fields = song_fields + 'year int, '
-song_fields = song_fields + 'duration NUMERIC(10,5)'
-	#
-song_table_create = (f'CREATE TABLE IF NOT EXISTS songs'
-                    f' ({song_fields})')
-	#
+
+song_table_create = ('CREATE TABLE IF NOT EXISTS songs'
+                        '(song_id varchar UNIQUE, '
+                        'title varchar, '
+                        'artist_id varchar, '
+                        'year int, '
+                        'duration NUMERIC(10,5))'
+                        )
+
 	######################################################################
 	# 04 - Table 'artists' has fields: artist_id, name, location,
 	#     latitude, longitude
 	#
 	#   NOTE: use of NUMERIC(precision, scale)
 	#
-artist_fields = ''
-artist_fields = artist_fields + 'artist_id varchar UNIQUE, '
-artist_fields = artist_fields + 'name varchar, '
-artist_fields = artist_fields + 'location varchar, '
-artist_fields = artist_fields + 'latitude NUMERIC(8,5), '
-artist_fields = artist_fields + 'longitude NUMERIC(8,5)'
-artist_table_create = (f'CREATE TABLE IF NOT EXISTS artists'
-                      f' ({artist_fields})')
-	#
+
+artist_table_create = ('CREATE TABLE IF NOT EXISTS artists'
+                          '(artist_id varchar UNIQUE, '
+                          'name varchar, '
+                          'location varchar, '
+                          'latitude NUMERIC(8,5), '
+                          'longitude NUMERIC(8,5))'
+                          )
+
 	######################################################################
 	#   05 - Table 'time' has fields: start_time, hour, day, week, month,
 	#       year, weekday
 	#
-timestamp_fields = ''
-timestamp_fields = timestamp_fields + 'start_time timestamp UNIQUE, '
-timestamp_fields = timestamp_fields + 'hour int, '
-timestamp_fields = timestamp_fields + 'day int, '
-timestamp_fields = timestamp_fields + 'week int, '
-timestamp_fields = timestamp_fields + 'month int, '
-timestamp_fields = timestamp_fields + 'year int, '
-timestamp_fields = timestamp_fields + 'weekday varchar'
-	#
+
 time_table_create = (f'CREATE TABLE IF NOT EXISTS time'
-                    f' ({timestamp_fields})')
-	#
+                         '(start_time timestamp UNIQUE, '
+                         'hour int, '
+                         'day int, '
+                         'week int, '
+                         'month int, '
+                         'year int, '
+                         'weekday varchar)'
+                         )
+
+
 	######################################################################
 	# INSERT RECORDS
 	# ==============
 	#
+
 songplay_table_insert = ('INSERT INTO songplays'
                         ' (songplay_id, start_time, user_id, level,'
                         ' song_id, artist_id, session_id, location,'
@@ -127,7 +124,7 @@ time_table_insert = ('INSERT INTO time'
                     ' weekday)'
                     ' VALUES (%s, %s, %s, %s, %s, %s, %s);')
 
-	#
+
 	######################################################################
 	# FIND SONGS  (row.song, row.artist, row.length))
 	# ==========
@@ -136,7 +133,8 @@ song_select = ('SELECT songs.song_id, artists.artist_id'
               ' FROM songs JOIN artists'
               ' ON songs.artist_id = artists.artist_id'
               ' WHERE title = (%s);')
-	#
+
+
 	######################################################################
 	# QUERY LISTS
 	# ===========

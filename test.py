@@ -4,11 +4,14 @@
 #  Standalone version of the tests offered in test.ipynb
 #
 ########################################################################
-    #
+
+
     ####################################################################
     # imports
     #
 import psycopg2
+
+
     ####################################################################
     # 'Standardise' some underlining and use wit some 'debugging print'
     #   statements to help understand what's going on as we develop code
@@ -16,23 +19,29 @@ import psycopg2
 UNDERLINE_1 = "========================================================"
 UNDERLINE_2 = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 UNDERLINE_3 = "--------------------------------------------------------"
+
+
     ####################################################################
     # LOGGING
     # =======
     #
 import logging
 logging.basicConfig(level=logging.INFO)
-    #
+
+
     ####################################################################
     # ALLOW limits in SQL queries ... or not
     # ======================================
     #
 #LIMIT_STRING = ' LIMIT 5'
 LIMIT_STRING = ''
+
+
     ####################################################################
     # MAIN
     # ====
-    #
+
+
 def main():
     logging.warning(
         f'\n'
@@ -92,10 +101,11 @@ def main():
     sql = f'SELECT * FROM songplays{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
+        songplays_rows_found = sparkify_cursor.rowcount
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {sparkify_cursor.rowcount}\n\n'
+            f'  Rows in sparify_cursor: {songplays_rows_found}\n\n'
             f'First five songplays records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -122,10 +132,11 @@ def main():
     sql = f'SELECT * FROM users{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
+        users_rows_found = sparkify_cursor.rowcount
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {sparkify_cursor.rowcount}\n\n'
+            f'  Rows in sparify_cursor: {users_rows_found}\n\n'
             f'First five users records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -152,10 +163,11 @@ def main():
     sql = f'SELECT * FROM songs{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
+        songs_rows_found = sparkify_cursor.rowcount
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {sparkify_cursor.rowcount}\n\n'
+            f'  Rows in sparify_cursor: {songs_rows_found}\n\n'
             f'First five songs records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -182,10 +194,11 @@ def main():
     sql = f'SELECT * FROM artists{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
+        artists_rows_found = sparkify_cursor.rowcount
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {sparkify_cursor.rowcount}\n\n'
+            f'  Rows in sparify_cursor: {artists_rows_found}\n\n'
             f'First five artists records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -212,10 +225,11 @@ def main():
     sql = f'SELECT * FROM time{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
+        time_rows_found = sparkify_cursor.rowcount
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {sparkify_cursor.rowcount}\n\n'
+            f'  Rows in sparify_cursor: {time_rows_found}\n\n'
             f'First five time records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -273,11 +287,24 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
+
+    logging.info(
+            f'\n'
+            f'  Summary of tables\n'
+            f'  =================\n'
+            f'    Rows found in songplays table: {songplays_rows_found}\n'
+            f'    Rows found in users table: {users_rows_found}\n'
+            f'    Rows found in songs table: {songs_rows_found}\n'
+            f'    Rows found in artists table: {artists_rows_found}\n'
+            f'    Rows found in time table: {time_rows_found}\n'
+            )
+
     logging.warning(
         f'\n'
         f'  We\'ve got to the end!!\n\n'
         f'{UNDERLINE_2}\n\n'
         )
+
 
 if __name__ == "__main__":
     main()

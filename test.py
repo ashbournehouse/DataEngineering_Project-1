@@ -48,6 +48,7 @@ def main():
         f'  We\'re at the beginning of the test script ...\n'
         f'{UNDERLINE_3}'
         )
+
         ################################################################
         # Create and connect to the sparkifydb
         # Returns the connection and cursor to sparkifydb
@@ -72,6 +73,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
+
         ################################################################
         # Use that conection to get a 'cursor' that can be used to
         #   execute queries
@@ -93,6 +95,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
+
         ################################################################
         # TEST 1
         # ======
@@ -124,6 +127,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # TEST 2
         # ======
@@ -155,6 +159,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # TEST 3
         # ======
@@ -186,6 +191,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # TEST 4
         # ======
@@ -217,6 +223,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # TEST 5
         # ======
@@ -248,6 +255,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         #################################################################
         #
         # Do a clean shutdown of the cursor and connection
@@ -268,6 +276,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
+
         ################################################################
         # Close the connection
         #

@@ -4,7 +4,8 @@
 #   ./Exp[eriments/print_dataframe.py
 #
 ########################################################################
-    #
+
+
     ####################################################################
     # imports
     #
@@ -16,6 +17,8 @@ import json                   # handy for debug-printing dictionaries
 import pandas as pd
 import numpy as np
 from sql_queries import *
+
+
     ####################################################################
     # 'Standardise' some underlining and use wit some 'debugging print'
     #   statements to help understand what's going on as we develop code
@@ -23,6 +26,8 @@ from sql_queries import *
 UNDERLINE_1 = "========================================================"
 UNDERLINE_2 = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 UNDERLINE_3 = "--------------------------------------------------------"
+
+
     ####################################################################
     # LOGGING
     # =======
@@ -70,9 +75,12 @@ UNDERLINE_3 = "--------------------------------------------------------"
     #    log analysis is to be used
     #  ----------------------------------------------------------------
     #
+
+
 import logging
 logging.basicConfig(level=logging.INFO)
-    #
+
+
     ####################################################################
     # Using a global variable to count handled errors is clunky but ...
     #   ... pragmatic here as it saves hunting through lots of output
@@ -80,10 +88,13 @@ logging.basicConfig(level=logging.INFO)
     #
 handled_errors = 0
 
+
 def process_song_file(cursor, filepath):
+
     global handled_errors
     songs_saved_to_database = 0
     artists_saved_to_database = 0
+
         ################################################################
         # This processes one song file ... I think ...
         #
@@ -100,13 +111,14 @@ def process_song_file(cursor, filepath):
         f'{UNDERLINE_3}')
     try:
         dataframe = pd.read_json(filepath, typ='series')
-    except:
+    except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
             f'\n'
             f'  Something went wrong converting to a dataframe for:\n'
             f'    {os.path.basename(filepath)}\n'
             f'{UNDERLINE_1}')
+
         ################################################################
         # Task #1: Populate Songs Table
         # =============================
@@ -138,13 +150,14 @@ def process_song_file(cursor, filepath):
         year = song_fields[9]
         song_data = tuple([song_id, title, artist_id, year, duration])
         logging.debug(f'\n  song_data tuple is: {song_data}')
-
-    except:
+    except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
             f'\n'
             f'  Something went wrong building the song_data tuple\n'
             f'{UNDERLINE_1}')
+
+
         ################################################################
         # With everything prepared, insert the song data into the
         #   database.
@@ -161,6 +174,8 @@ def process_song_file(cursor, filepath):
             f'  Error saving song data record\n'
             f'    {e}\n'
             f'{UNDERLINE_1}\n')
+
+
         ################################################################
         # Task #2: Populate Artists Table
         #
@@ -172,12 +187,14 @@ def process_song_file(cursor, filepath):
         logging.debug(
             f'\n'
             f'  artist_data tuple is: {artist_data}')
-    except:
+    except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
             f'\n'
             f'Something went wrong building the artist_data tuple\n'
             f'{UNDERLINE_1}')
+
+
         ############################################################
         # With everything prepared, insert the artist data into
         #   the database.
@@ -209,7 +226,9 @@ def process_song_file(cursor, filepath):
         f'    Artists saved to database: {artists_saved_to_database}\n'
         f'{UNDERLINE_3}')
 
+
 def process_log_file(cursor, filepath):
+
     global handled_errors
         ################################################################
         # This processes one log file ...
@@ -226,6 +245,7 @@ def process_log_file(cursor, filepath):
         # Use pandas to open the log file ...
         #
         #
+
     logging.info(f'\n\
       Entering process_log_file for: \
       {os.path.basename(filepath)}\n{UNDERLINE_3}')
@@ -242,6 +262,7 @@ def process_log_file(cursor, filepath):
             f'Data fields (tail)\n'
             f'{dataframe.tail()}\n\n'
             f'{UNDERLINE_3}')
+
        #################################################################
         # This error handling might be better spun out to a function
         #
@@ -269,13 +290,14 @@ def process_log_file(cursor, filepath):
             f'    {os.path.basename(filepath)}'
             f'  Error message is:\n\n{ve}\n'
             f'{UNDERLINE_1}\n')
-    except:
+    except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
             f'\n'
             f'  Some other non-OSError occurred reading:\n'
             f'    {os.path.basename(filepath)}'
             f'{UNDERLINE_1}\n')
+
         ################################################################
         # filter by NextSong action to remove unwanted data
         #
@@ -322,7 +344,7 @@ def process_log_file(cursor, filepath):
             f'  Error message is:\n\n{ne}\n\n'
             f'{UNDERLINE_3}'
             )
-    except:
+    except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
             f'\n'
@@ -330,6 +352,7 @@ def process_log_file(cursor, filepath):
             f'    dataframe from: {os.path.basename(filepath)}\n'
             f'{UNDERLINE_3}'
             )
+
             ############################################################
             # DEBUG --- Check for sensible looking user table data ...
             #
@@ -348,6 +371,7 @@ def process_log_file(cursor, filepath):
             )
     log_string += f'{UNDERLINE_3}'
     logging.debug(log_string)
+
         ################################################################
         # Task #3: Populate Time Table
         # ============================
@@ -394,11 +418,13 @@ def process_log_file(cursor, filepath):
         f'  Setting up a python list of python dictionaries for the'
         f' time data ...\n'
         )
+
             ############################################################
             #    (d1) - Set up a Python list to hold the time data
             #             records extracted from the file
             #
     timedata_list = list()
+
         ################################################################
         #    (d2) - Loop over the dataframe derived from the input file,
         #             extracting the records we want
@@ -410,6 +436,7 @@ def process_log_file(cursor, filepath):
     try:
         for index, row in dataframe.iterrows():
             as_datetime = pd.to_datetime(row["ts"], unit="ms")
+
                 ########################################################
                 #    (d3) - Make a Python dictionary from each row in
                 #             the dataframe
@@ -437,6 +464,7 @@ def process_log_file(cursor, filepath):
                 f'\n'
                 )
             loopcount += 1
+
                 ########################################################
                 #    (d4) - Append that to the timedata list
                 #
@@ -451,13 +479,14 @@ def process_log_file(cursor, filepath):
             f'{UNDERLINE_3}'
             )
         logging.debug(UNDERLINE_3)
-    except:
+    except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
             f'\n'
             f'  An error occurred when extracting data to the '
             f'time_dict:\n'
             f'{UNDERLINE_3}')
+
             ############################################################
             #    (d5) - Use the list of dictionaries to make a new
             #             dataframe (pandas has a convenient method)
@@ -470,7 +499,7 @@ def process_log_file(cursor, filepath):
             f'{time_dataframe.to_string()}\n'
             f'{UNDERLINE_3}'
             )
-    except:
+    except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
             f'\n'
@@ -478,6 +507,7 @@ def process_log_file(cursor, filepath):
             f'dataframe:\n'
             f'{UNDERLINE_3}'
             )
+
         ################################################################
         #    (d6) - Use the new dataframe to create database records
         #              (again pandas has a convenient method)
@@ -507,6 +537,7 @@ def process_log_file(cursor, filepath):
         f'{UNDERLINE_3}'
         )
     logging.info(log_string)
+
         ################################################################
         # Task #4: Populate User Table
         # ============================
@@ -525,13 +556,15 @@ def process_log_file(cursor, filepath):
         #          we'll still get all the users.
         #
     try:
-        #user_dataframe = next_song_rows[['userId', 'firstName', 'lastName', 'gender', 'level']]
             ############################################################
             # If we don't want duplicate user records in the database!
             #
             # NOTE: This will only stop us creating duplicate user
             #   records from a given file. We need a constraint on the
             #   database when we create it fully to prevent duplicates.
+            #
+            #   Nonetheless: not attempting to save know duplicates
+            #   will save resources.
             #
         user_dataframe = next_song_rows[['userId', 'firstName', 'lastName', 'gender', 'level']].drop_duplicates(subset=['userId'])
         logging.info (
@@ -572,7 +605,7 @@ def process_log_file(cursor, filepath):
             f'\nError message is:\n\n{ne}\n\n'
             f'{UNDERLINE_3}'
             )
-    except:
+    except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
             f'\n'
@@ -580,6 +613,7 @@ def process_log_file(cursor, filepath):
             f'users.\n\n'
             f'{UNDERLINE_3}'
             )
+
         ################################################################
         # Insert user records once again using the iterrows method
         #   provided by pandas
@@ -602,6 +636,7 @@ def process_log_file(cursor, filepath):
                 )
     log_string += f'{UNDERLINE_3}'
     logging.info(log_string)
+
         ################################################################
         # Task #5: Populate 'songplays' Table
         # ===================================
@@ -680,6 +715,7 @@ def process_log_file(cursor, filepath):
         f'{UNDERLINE_3}'
         )
 
+
 def process_data(cursor, connection, filepath, func):
     global handled_errors
     logging.info(
@@ -692,7 +728,7 @@ def process_data(cursor, connection, filepath, func):
         f'  Absolute path is:\n  {os.path.abspath(filepath)}\n'
         f'{UNDERLINE_3}'
         )
-#
+
             ############################################################
             # Get all files matching extension from directory using os
             #   and glob
@@ -700,8 +736,9 @@ def process_data(cursor, connection, filepath, func):
     all_files = []
     for root, dirs, files in os.walk(filepath):
         files = glob.glob(os.path.join(root,'*.json'))
-        for file in files :
+        for file in files:
             all_files.append(os.path.abspath(file))
+
         ################################################################
         # get total number of files found
         #
@@ -712,6 +749,7 @@ def process_data(cursor, connection, filepath, func):
         f'{os.path.basename(filepath)}\n'
         f'{UNDERLINE_2}'
         )
+
             ############################################################
             # iterate over files and process
             #
@@ -728,6 +766,7 @@ def process_data(cursor, connection, filepath, func):
         f'{os.path.basename(filepath)} with: {func}\n'
         f'{UNDERLINE_1}'
         )
+
 
 def main():
     global handled_errors
@@ -783,6 +822,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
+
         ################################################################
         # TASKS #1 & #2
         # =============
@@ -831,6 +871,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
+
         ################################################################
         # TASKS #3, #4 & #5
         # =================
@@ -843,6 +884,7 @@ def main():
         filepath=logs_datapath,
         func=process_log_file
         )
+
         #################################################################
         #
         # Do a clean shutdown of the cursor and connection
@@ -863,6 +905,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
+
         ################################################################
         # Close the connection
         #
@@ -882,12 +925,14 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_1}'
             )
+
     logging.warning(
         f'\n'
         f'  Handled errors encountered: {handled_errors}\n\n'
         f'  We\'ve got to the end!!\n\n'
         f'{UNDERLINE_2}\n\n'
         )
+
 
 if __name__ == "__main__":
     main()

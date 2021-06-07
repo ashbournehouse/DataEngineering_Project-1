@@ -3,7 +3,8 @@
 #   by Udacity Data Engineering - Project 1 'Modeling in Postgres'
 #
 ########################################################################
-    #
+
+
     ####################################################################
     # Imports
     #
@@ -13,15 +14,20 @@ from sql_queries import create_table_queries, drop_table_queries
 UNDERLINE_1 = "========================================================"
 UNDERLINE_2 = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 UNDERLINE_3 = "--------------------------------------------------------"
+
+
     ####################################################################
     # Basic logger setup
     #
 import logging
 logging.basicConfig(level=logging.INFO)
+
+
     ####################################################################
     # Create database
     #
 def create_database():
+
         ################################################################
         # Create and connect to the sparkifydb
         # Returns the connection and cursor to sparkifydb
@@ -45,6 +51,7 @@ def create_database():
             f'{admin_connection}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # Set auto-commit for this connection
         #
@@ -64,6 +71,7 @@ def create_database():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # Use that conection to get a 'cursor' that can be used to
         #   execute queries
@@ -84,6 +92,7 @@ def create_database():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # Drop and create sparkify database with UTF8 encoding
         #
@@ -105,6 +114,7 @@ def create_database():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ###############################################################
         # Create the sparkify database
         #
@@ -128,10 +138,12 @@ def create_database():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # close connection to default database
         #
     admin_connection.close()
+
         ################################################################
         # Create a connection to 'sparkify' database
         #
@@ -154,6 +166,7 @@ def create_database():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # Use that conection to get a 'cursor' that can be used to
         #   execute queries
@@ -174,6 +187,7 @@ def create_database():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # EMERGENCY close all pids where something has gone wrong!!!
         #
@@ -188,6 +202,7 @@ def create_database():
 
 
 def drop_tables(cursor, connecction):
+
         ################################################################
         # Drop all tables using the queries in `drop_table_queries`
         #   list.
@@ -195,6 +210,7 @@ def drop_tables(cursor, connecction):
     for query in drop_table_queries:
         cursor.execute(query)
         connecction.commit()
+
 
 def create_tables(cursor, connecction):
         ################################################################
@@ -205,26 +221,31 @@ def create_tables(cursor, connecction):
         cursor.execute(query)
         connecction.commit()
 
+
 def main():
     logging.warning(
         f'\n'
         f'  We\'re at the beginning ...\n'
         f'{UNDERLINE_3}'
         )
+
         ################################################################
         # Drops (if it exists) and creates the sparkify database, then
         #   establishes connection with the sparkify database and
         #   gets a cursor to it.
         #
     sparkify_cursor, sparkify_connection = create_database()
+
         ################################################################
         # Drop all the tables.
         #
     drop_tables(sparkify_cursor, sparkify_connection)
+
         ################################################################
         # Creates all tables needed.
         #
     create_tables(sparkify_cursor, sparkify_connection)
+
         ################################################################
         #
         # Do a clean shutdown of the cursor and connection
@@ -244,6 +265,7 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
         ################################################################
         # Close the connection
         #
@@ -262,11 +284,13 @@ def main():
             f'    {e}\n'
             f'{UNDERLINE_2}'
             )
+
     logging.warning(
         f'\n'
         f'  We\'ve got to the end!!\n\n'
         f'{UNDERLINE_1}\n\n'
         )
+
 
 if __name__ == "__main__":
     main()

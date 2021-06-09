@@ -1,39 +1,86 @@
-########################################################################
-# 21/05/2021 - This script kills and rebuilds the tables required
-#   by Udacity Data Engineering - Project 1 'Modeling in Postgres'
-#
-########################################################################
+"""
+21/05/2021 - Udacity Data Engineering - Create Tables Script
+============================================================
 
+  Standalone version create_tables script.
 
-    ####################################################################
-    # Imports
-    #
+  'Kills and rebuilds' each of the five table definitions
+  required by the etl.py script.
+
+  Part of my submission for:
+    Udacity Data Engineering - Project 1 'Modelling in Postgres'
+
+"""
+
+"""
+Imports
+=======
+
+  psycopg2 to handle interaction with PostgreSQL
+  sql_queries.py is part of the submission required by this porject.
+
+"""
+
 import psycopg2
 from sql_queries import create_table_queries, drop_table_queries
+
+"""
+Underlining
+===========
+  'Standardise' some underlining and use with logging output
+  helping to understand what's going on as we develop code.
+
+"""
 
 UNDERLINE_1 = "========================================================"
 UNDERLINE_2 = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 UNDERLINE_3 = "--------------------------------------------------------"
 
+"""
+Logging
+=======
 
-    ####################################################################
-    # Basic logger setup
-    #
+  Using the Python logger makes code much more readable then using
+  'debug print' statements
+
+"""
+
 import logging
 logging.basicConfig(level=logging.INFO)
 
 
-    ####################################################################
-    # Create database
-    #
+"""
+Create Database
+===============
+"""
+
 def create_database():
 
-        ################################################################
-        # Create and connect to the sparkifydb
-        # Returns the connection and cursor to sparkifydb
-        ################################################################
-        # Create a connection to postgreSQL
-        #
+    """
+    Connects to the default database on a local postgreSQL
+    installation, then:
+
+     - Obtains a 'cursor' to allow submission of queries
+     - Perfoms a 'kill and rebuild' of the 'sparkify' database by:
+       * Droping the 'sparkify' datbase if it exists.
+       * Creating a new 'sparkify' database
+       * Closing the connection to the default database
+       * Obtaining a connection to the sparkify database
+       * Obtaining a cursor to the sparkify database
+
+    Parameters: none.
+
+    Returns:
+
+     - The connection object for the new database
+     - The cursor object for the new database
+
+    """
+
+    """
+    Create a connection to default postgreSQL database
+    """
+
     try:
         admin_connection = psycopg2.connect(
             'host=127.0.0.1 dbname=studentdb user=student password=student'
@@ -52,9 +99,10 @@ def create_database():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # Set auto-commit for this connection
-        #
+    """
+    Set auto-commit for this connection
+    """
+
     try:
         admin_connection.set_session(autocommit=True)
         logging.info(
@@ -72,10 +120,11 @@ def create_database():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # Use that conection to get a 'cursor' that can be used to
-        #   execute queries
-        #
+    """
+    Use that conection to get a 'cursor' that can be used to
+      execute queries
+    """
+
     try:
         cursor = admin_connection.cursor()
         logging.info(
@@ -93,9 +142,11 @@ def create_database():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # Drop and create sparkify database with UTF8 encoding
-        #
+    """
+    Drop the 'sparkify' database, if it already exits, this
+      is the 'kill' part of 'kill and rebuild'
+    """
+
     database_name = 'sparkify'
     sql = f'DROP DATABASE IF EXISTS {database_name}'
     try:
@@ -115,9 +166,11 @@ def create_database():
             f'{UNDERLINE_2}'
             )
 
-        ###############################################################
-        # Create the sparkify database
-        #
+    """
+    Create the 'sparkify' database, this is the start of the
+      rebuild part of 'kill and rebuild'
+    """
+
     sql = (
             f'CREATE DATABASE {database_name}'
             f' WITH ENCODING \'utf8\' TEMPLATE template0'
@@ -139,14 +192,18 @@ def create_database():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # close connection to default database
-        #
+    """
+    Close connection to default database to avoid any confusion and
+      it's generally a safer way to do things.
+    """
+
     admin_connection.close()
 
-        ################################################################
-        # Create a connection to 'sparkify' database
-        #
+    """
+    Create a new connection to the new 'sparkify' database for all
+      further operations.
+    """
+
     try:
         sparkify_connection = psycopg2.connect(
             'host=127.0.0.1 dbname=studentdb user=student password=student'
@@ -167,10 +224,11 @@ def create_database():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # Use that conection to get a 'cursor' that can be used to
-        #   execute queries
-        #
+    """
+    Get a new cursor object for the 'sparkify' database to allow
+      execution of all further queries.
+    """
+
     try:
         sparkify_cursor = sparkify_connection.cursor()
         logging.info(

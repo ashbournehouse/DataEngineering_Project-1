@@ -1,58 +1,98 @@
-########################################################################
-# 05/06/2021 - Udacity Data Engineering - test Script
-#  
-#  Standalone version of the tests offered in test.ipynb
-#
-########################################################################
+"""
+05/06/2021 - Udacity Data Engineering - Test Script
+===================================================
 
+  Standalone version of the tests offered in test.ipynb
 
-    ####################################################################
-    # imports
-    #
+"""
+
+"""
+Imports
+=======
+
+  psycopg2 to handle interaction with PostgreSQL
+
+"""
+
 import psycopg2
 
 
-    ####################################################################
-    # 'Standardise' some underlining and use wit some 'debugging print'
-    #   statements to help understand what's going on as we develop code
-    #
+"""
+Underlining
+===========
+  'Standardise' some underlining and use with logging output
+  helping to understand what's going on as we develop code.
+
+"""
+
 UNDERLINE_1 = "========================================================"
 UNDERLINE_2 = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 UNDERLINE_3 = "--------------------------------------------------------"
 
 
-    ####################################################################
-    # LOGGING
-    # =======
-    #
+"""
+Logging
+=======
+
+  Using the Python logger make code much more readable then using
+  'debug print' statements
+
+"""
+
 import logging
 logging.basicConfig(level=logging.INFO)
 
 
-    ####################################################################
-    # ALLOW limits in SQL queries ... or not
-    # ======================================
-    #
+"""
+Limit Constants
+===============
+
+  Aloow limits in SQL queries ... or not by commemting out one or
+  other of the lines below. This allows comprehensive or summarised
+  testing.
+
+"""
+
 #LIMIT_STRING = ' LIMIT 5'
 LIMIT_STRING = ''
 
 
-    ####################################################################
-    # MAIN
-    # ====
-
+"""
+Main
+====
+"""
 
 def main():
-    logging.warning(
+
+    """
+    Main runs queries on each of the five tables counting the number
+    of lines in each table then displaying 5 (or more, see above)
+    lines of actual data.
+
+    The number of lines in each table is repeated at the end of the
+    test run to give a summary check.
+
+    The tests could, possibly should, be spun out to a single
+    functio that is called 5 times, but this s a quick-and-dirty
+    test script.
+
+    Parameters: none.
+
+    Returns: none.
+
+    """
+
+    logging.info(
         f'\n'
         f'  We\'re at the beginning of the test script ...\n'
         f'{UNDERLINE_3}'
         )
 
-        ################################################################
-        # Create and connect to the sparkifydb
-        # Returns the connection and cursor to sparkifydb
-        #
+    """
+    Create and connect to the sparkifydb
+    Returns the connection and cursor to sparkifydb
+
+    """
     try:
         sparkify_connection = psycopg2.connect(
             'host=127.0.0.1 dbname=studentdb user=student password=student'
@@ -74,10 +114,12 @@ def main():
             f'{UNDERLINE_1}'
             )
 
-        ################################################################
-        # Use that conection to get a 'cursor' that can be used to
-        #   execute queries
-        #
+    """
+    Use the conection to get a 'cursor' that can be used to
+    execute queries.
+
+    """
+
     try:
         sparkify_cursor = sparkify_connection.cursor()
         logging.info(
@@ -96,11 +138,13 @@ def main():
             f'{UNDERLINE_1}'
             )
 
-        ################################################################
-        # TEST 1
-        # ======
-        #   Select first five records from songplays;
-        #
+    """
+    TEST 1
+    ======
+      Selects first 'n' records from the songplays table
+
+    """
+
     sql = f'SELECT * FROM songplays{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
@@ -128,11 +172,13 @@ def main():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # TEST 2
-        # ======
-        #   Select first five records from users;
-        #
+    """
+    TEST 2
+    ======
+      Selects first 'n' records from the users table.
+
+    """
+
     sql = f'SELECT * FROM users{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
@@ -160,11 +206,13 @@ def main():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # TEST 3
-        # ======
-        #   Select first five records from songs;
-        #
+    """
+    TEST 3
+    ======
+      Selects first 'n' records from the songs table.
+
+    """
+
     sql = f'SELECT * FROM songs{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
@@ -192,11 +240,13 @@ def main():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # TEST 4
-        # ======
-        #   Select first five records from artists;
-        #
+    """
+    TEST 4
+    ======
+      Selects first 'n' records from the artists table.
+
+    """
+
     sql = f'SELECT * FROM artists{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
@@ -224,11 +274,13 @@ def main():
             f'{UNDERLINE_2}'
             )
 
-        ################################################################
-        # TEST 5
-        # ======
-        #   Select first five records from time;
-        #
+    """
+    TEST 5
+    ======
+      Selects first 'n' records from the time table.
+
+    """
+
     sql = f'SELECT * FROM time{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
@@ -256,10 +308,13 @@ def main():
             f'{UNDERLINE_2}'
             )
 
-        #################################################################
-        #
-        # Do a clean shutdown of the cursor and connection
-        #
+    """
+    Cleanup
+    =======
+      Do a clean shutdown of the cursor and connection.
+
+    """
+
     try:
         sparkify_cursor.close()
         logging.info(
@@ -277,9 +332,6 @@ def main():
             f'{UNDERLINE_1}'
             )
 
-        ################################################################
-        # Close the connection
-        #
     try:
         sparkify_connection.close()
         logging.info(
@@ -297,6 +349,15 @@ def main():
             f'{UNDERLINE_1}'
             )
 
+    """
+    Log a summary
+    =============
+      At the end of many rows of log output this gives a quick
+      check that things are working consistently during
+      development.
+
+    """
+
     logging.info(
             f'\n'
             f'  Summary of tables\n'
@@ -308,7 +369,15 @@ def main():
             f'    Rows found in time table: {time_rows_found}\n'
             )
 
-    logging.warning(
+    """
+    Log completion
+    ==============
+      When using try-except clauses it's worth logging the
+      intended completion og the script.
+
+    """
+
+    logging.info(
         f'\n'
         f'  We\'ve got to the end!!\n\n'
         f'{UNDERLINE_2}\n\n'

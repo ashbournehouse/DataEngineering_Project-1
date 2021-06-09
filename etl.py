@@ -94,11 +94,24 @@ logging.basicConfig(level=logging.INFO)
 """
 
 handled_errors = 0
+
+songs_saved = 0
 song_duplicates = 0
+
+artists_saved = 0
 artist_duplicates = 0
+
+times_saved = 0
 time_duplicates = 0
+
+users_saved = 0
 user_duplicates = 0
+
+songplays_saved = 0
 songplays_duplicates = 0
+
+song_select_finds = 0
+song_select_responses = []
 
 
 def process_song_file(cursor, filepath):
@@ -125,11 +138,12 @@ def process_song_file(cursor, filepath):
     """
 
     global handled_errors
-    global song_duplicates
-    global artist_duplicates
 
-    songs_saved_to_database = 0
-    artists_saved_to_database = 0
+    global songs_saved
+    global song_duplicates
+
+    global artists_saved
+    global artist_duplicates
 
     """
       NOTE: When using pandas.read_json with a single line of json
@@ -141,7 +155,7 @@ def process_song_file(cursor, filepath):
 
     """
 
-    logging.info(
+    logging.debug(
         f'\n'
         f'  Entering process_song_file for: '
         f'{os.path.basename(filepath)}\n'
@@ -184,7 +198,7 @@ def process_song_file(cursor, filepath):
         year = dataseries.iloc[9]
 
         song_data = tuple([song_id, title, artist_id, year, duration])
-        logging.info(f'\n  song_data tuple is: {song_data}')
+        logging.debug(f'\n  song_data tuple is: {song_data}')
     except Exception:       # recommedned by PEP8
         handled_errors += 1
         logging.error(
@@ -197,7 +211,7 @@ def process_song_file(cursor, filepath):
     """
     try:
         cursor.execute(song_table_insert, song_data)
-        songs_saved_to_database += 1
+        songs_saved += 1
         logging.debug(
             f'\n'
             f'  Song data record saved to database')
@@ -255,7 +269,7 @@ def process_song_file(cursor, filepath):
 
     try:
         cursor.execute(artist_table_insert, artist_data)
-        artists_saved_to_database += 1
+        artists_saved += 1
         logging.debug(
             f'\n'
             f'  Artist data record saved to database')
@@ -276,12 +290,10 @@ def process_song_file(cursor, filepath):
                 f'    {e}\n'
                 f'{UNDERLINE_3}'
                 )
-    logging.info(
+    logging.debug(
         f'\n'
-        f'  process_song_file complete\n'
-        f'    Songs saved to database: {songs_saved_to_database}\n'
-        f'    Artists saved to database: {artists_saved_to_database}\n'
-        f'{UNDERLINE_3}')
+        f'  process_song_file completefor: {os.path.basename(filepath)}\n'
+        f'{UNDERLINE_3}\n')
 
 
 def process_log_file(cursor, filepath):
@@ -307,16 +319,25 @@ def process_log_file(cursor, filepath):
     """
 
     global handled_errors
+
+    global times_saved
     global time_duplicates
+
+    global users_saved
     global user_duplicates
+
+    global songplays_saved
     global songplays_duplicates
+
+    global song_select_finds
+    global song_select_responses
 
 
     """
       Use pandas to open the log file ...
     """
 
-    logging.info(f'\n\
+    logging.debug(f'\n\
       Entering process_log_file for: \
       {os.path.basename(filepath)}\n{UNDERLINE_3}')
     try:
@@ -372,7 +393,7 @@ def process_log_file(cursor, filepath):
 
     try:
         next_song_rows = dataframe.loc[dataframe["page"] == "NextSong"]
-        logging.info(
+        logging.debug(
             f'\n'
             f'  Filtering records where page == NextSong for:\n'
             f'    dataframe from: {os.path.basename(filepath)}\n'
@@ -594,14 +615,15 @@ def process_log_file(cursor, filepath):
                 f'(Time) Row {i} list(row) is: {list(row)}\n'
                 )
             cursor.execute(time_table_insert, list(row))
+            times_saved += 1
             loopcount += 1
         except psycopg2.Error as e:
             if ('duplicate key' in str(e)):
                 time_duplicates += 1
                 logging.warning(
                     f'\n'
-                    f'Database reports a duplicate key for time: \n'
-                    f'{list(row)}\n'
+                    f'Database reports a duplicate key for time: '
+                    f'{list(row)[0]}\n'
                     f'{UNDERLINE_3}'
                     )
             else:
@@ -616,7 +638,7 @@ def process_log_file(cursor, filepath):
         f'{loopcount} records added to the database\n'
         f'{UNDERLINE_3}'
         )
-    logging.info(log_string)
+    logging.debug(log_string)
 
     """
       Task #4: Populate User Table
@@ -653,7 +675,7 @@ def process_log_file(cursor, filepath):
                                          'gender',
                                          'level']].drop_duplicates(
                                             subset=['userId'])
-        logging.info (
+        logging.debug (
             f'\n'
             f'  Extracting a user-dataframe from file: '
             f'{os.path.basename(filepath)}\n\n'
@@ -713,13 +735,14 @@ def process_log_file(cursor, filepath):
                 f'(User) Row {i} list(row) is: {list(row)}\n'
                 )
             cursor.execute(user_table_insert, list(row))
+            users_saved += 1
         except psycopg2.Error as e:
             if ('duplicate key' in str(e)):
                 user_duplicates += 1
                 logging.warning(
                     f'\n'
-                    f'Database reports a duplicate key for user: \n'
-                    f'{list(row)}\n'
+                    f'Database reports a duplicate key for user: '
+                    f'{list(row)[0:3]}\n'
                     f'{UNDERLINE_3}'
                     )
             else:
@@ -729,7 +752,7 @@ def process_log_file(cursor, filepath):
                     f'  Error saving user data record\n {e}'
                     f'{UNDERLINE_3}'
                     )
-    logging.info(log_string)
+    logging.debug(log_string)
 
     """
       Task #5: Populate 'songplays' Table
@@ -760,47 +783,122 @@ def process_log_file(cursor, filepath):
     log_string += (UNDERLINE_2)
     logging.info(log_string)
 
+    logging.warning(
+        f'\n'
+        f'  next_song_rows dataframe looks like this: \n\n'
+        f'{next_song_rows.head()}'
+        f'{UNDERLINE_3}'
+        )
+
     log_string = (
         f'\n'
         f'  Retrieving song and artist IDs using an SQL query ...\n\n'
         )
-            # REMEMBER it's the next_song_rows dataframe !!!
+    """
+      REMEMBER it's the next_song_rows dataframe !!!
+
+        This has fields:
+          "artist":
+          "auth":
+          "firstName":
+          "gender":
+          "itemInSession":
+          "lastName":
+          "length":
+          "level":
+          "location":
+          "method"
+          "page":
+          "registration":
+          "sessionId":
+          "song":
+          "status":
+          "ts":
+          "userAgent":
+          "userId":
+    """
     for index, row in next_song_rows.iterrows():
-            ############################################################
-            # Get songid and artistid from song and artist tables
-            #
-            #   Remeber:
-            #     song_select = 'SELECT song_id, artist_id FROM songs
-            #                    JOIN artists ON artist_id
-            #                    WHERE (title = %s,
-            #                           name = %s,
-            #                           duration = %s);'
-            #
-        query_values = tuple([row.song])
+
+        """
+          Get song_id and artist_id from song and artist tables
+
+            Remember:
+              song_select = 'SELECT song_id, artist_id
+                             FROM songs JOIN artists
+                             ON songs.artist_id = artists.artist_id
+                             WHERE title = (%s)
+                             AND name = (%s)
+                             AND duration = (%s);
+        """
+        query_values = tuple([row.song, row.artist, row.length])
+        """
+          Check the composed sql query
+        """
         logging.debug(
             f'\n'
-            f'  Composed SQL query is: '
-            f'{cursor.mogrify(song_select, query_values)}'
+            f'  Composed SQL query is: \n'
+            f'{cursor.mogrify(song_select, query_values)}\n'
             f'{UNDERLINE_3}'
             )
-        cursor.execute(song_select, query_values)
-        test = cursor.fetchone()
-        if (test is not None):
-            log_string += (
-                f'Song title: {row.song}, Artist ID {row.artist}'
-                f' => {test}\n')
-            ############################################################
-            # Insert songplay record
-            #   REMEMBER: - Table 'songplays' has fields:
-            #     songplay_id, start_time, user_id, level, song_id,
-            #     artist_id, session_id, location, user_agent
-            #
-        #songplay_data =
-        #cur.execute(songplay_table_insert, songplay_data)
-    log_string += f'{UNDERLINE_3}'
+        """
+          Execute the query
+        """
+        try:
+            cursor.execute(song_select, query_values)
+            response = cursor.fetchone()
+            if response:                  # == if response is not None
+                logging.warning(
+                    f'\n'
+                    f'  For title: {row.song}, artist: {row.artist} IDs are: '
+                    f'{response}\n'
+                    f'{UNDERLINE_3}'
+                    )
+                song_select_finds += 1
+                song_select_responses.append(response)
 
-    logging.info(log_string)
-    logging.info(
+                song_id, artist_id = response
+            else:
+                song_id = None
+                artist_id = None
+
+        except psycopg2.Error as e:
+            handled_errors += 1
+            logging.error(
+                f'\n'
+                f'  Error running select query: \n'
+                f'    {cursor.mogrify(song_select, query_values)}\n'
+                f'  Error reurned by psycopg2: \n'
+                f'    {e}\n'
+                f'{UNDERLINE_3}'
+                )
+
+        """
+          Insert songplay record
+            REMEMBER: - Table 'songplays' has fields:
+                 songplay_id, start_time, user_id, level, song_id,
+                   artist_id, session_id, location, user_agent
+        """
+        songplay_data = tuple([
+                            pd.to_datetime(row['ts']),
+                            row['userId'],
+                            row['level'],
+                            song_id,
+                            artist_id,
+                            row['sessionId'],
+                            row['location'],
+                            row['userAgent']
+                            ])
+        try:
+            cursor.execute(songplay_table_insert, songplay_data)
+            songplays_saved += 1
+        except psycopg2.Error as e:
+            handled_errors += 1
+            logging.error(
+                f'\n'
+                f'  Error saving songplay data record\n {e}'
+                f'{UNDERLINE_3}'
+                )
+    logging.debug(
         f'\n'
         f'  process_log_file complete for file: '
         f'{os.path.basename(filepath)} \n'
@@ -827,7 +925,7 @@ def process_data(cursor, connection, filepath, func):
     """
     global handled_errors
 
-    logging.info(
+    logging.debug(
         f'\n'
         f'  Entering process_data for path: {filepath} with: {func}\n'
         f'{UNDERLINE_3}'
@@ -863,7 +961,7 @@ def process_data(cursor, connection, filepath, func):
         func(cursor, datafile)
         logging.info(
             f'\n'
-            f'  {i}/{num_files} files processed.\n'
+            f'  {os.path.basename(datafile)} complete: {i}/{num_files} files processed.\n'
             f'{UNDERLINE_2}'
             )
     logging.info(
@@ -895,7 +993,7 @@ def main():
     """
     global handled_errors
 
-    logging.warning(
+    logging.info(
         f'\n'
         f'  We\'re at the beginning ...\n'
         f'{UNDERLINE_3}'
@@ -908,7 +1006,7 @@ def main():
             'host=127.0.0.1 dbname=studentdb user=student password=student'
             )
         sparkify_connection.set_session(autocommit=True)
-        logging.info(
+        logging.debug(
             f'\n'
             f'  Connection open\n  {sparkify_connection}\n'
             f'{UNDERLINE_3}'
@@ -925,7 +1023,7 @@ def main():
             )
     try:
         sparkify_cursor = sparkify_connection.cursor()
-        logging.info(
+        logging.debug(
             f'\n'
             f'  Sparkify cursor active\n'
             f'{UNDERLINE_1}'
@@ -955,7 +1053,7 @@ def main():
     try:
         sql = 'SELECT count(*) from songs'
         sparkify_cursor.execute(sql)
-        logging.info(
+        logging.debug(
             f'\n'
             f'  Number of songs in the database: '
             f'{sparkify_cursor.fetchone()}\n'
@@ -973,7 +1071,7 @@ def main():
     try:
         sql = 'SELECT count(*) from artists'
         sparkify_cursor.execute(sql)
-        logging.info(
+        logging.debug(
             f'\n'
             f'  Number of artists in the database: '
             f'{sparkify_cursor.fetchone()}\n'
@@ -1005,7 +1103,7 @@ def main():
     """
     try:
         sparkify_cursor.close()
-        logging.info(
+        logging.debug(
             f'\n'
             f'  Sparkify cursor closed\n'
             f'{UNDERLINE_3}'
@@ -1021,7 +1119,7 @@ def main():
             )
     try:
         sparkify_connection.close()
-        logging.info(
+        logging.debug(
             f'\n'
             f'  Sparkify connection closed\n'
             f'{UNDERLINE_3}'
@@ -1038,14 +1136,21 @@ def main():
     """
       Say goodbye and log summary warnings
     """
-    logging.warning(
+    logging.info(
         f'\n'
         f'  Song duplicates encountered: {song_duplicates}\n'
         f'  Artist duplicates encountered: {artist_duplicates}\n'
         f'  Time duplicates encountered: {time_duplicates}\n'
         f'  User duplicates encountered: {user_duplicates}\n'
         f'  Songplays duplicates encountered: {songplays_duplicates}\n\n'
+        f'  \'not None\' returns from song select: {song_select_finds}\n\n'
+        f'    {song_select_responses}\n\n'
         f'  Handled errors encountered: {handled_errors}\n\n'
+        f'  Songs saved to database: {songs_saved}\n'
+        f'  Artists saved to database: {artists_saved}\n'
+        f'  Times saved to database: {times_saved}\n'
+        f'  Users saved to database: {users_saved}\n'
+        f'  Songplays saved to database: {songplays_saved}\n\n'
         f'  We\'ve got to the end!!\n\n'
         f'{UNDERLINE_2}\n\n'
         )

@@ -24,10 +24,10 @@ time_table_drop = f'DROP TABLE IF EXISTS time'
 	#     user_id, level, song_id, artist_id, session_id, location,
 	#     user_agent
 
-songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays'
-                            '(songplay_id int UNIQUE, '
-                            'start_time timestamp, '
-                            'user_id int, '
+songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays '
+                            '(start_time timestamp NOT NULL, '
+                            'user_id int NOT NULL, '
+                            'UNIQUE (start_time, user_id), '
                             'level varchar, '
                             'song_id varchar, '
                             'artist_id varchar, '
@@ -101,10 +101,10 @@ time_table_create = (f'CREATE TABLE IF NOT EXISTS time'
 	#
 
 songplay_table_insert = ('INSERT INTO songplays'
-                        ' (songplay_id, start_time, user_id, level,'
+                        ' (start_time, user_id, level,'
                         ' song_id, artist_id, session_id, location,'
                         ' user_agent)'
-   											' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);')
+   											' VALUES (%s, %s, %s, %s, %s, %s, %s, %s);')
 
 user_table_insert = ('INSERT INTO users'
                     ' (user_id, first_name, last_name, gender, level)'
@@ -132,8 +132,9 @@ time_table_insert = ('INSERT INTO time'
 song_select = ('SELECT songs.song_id, artists.artist_id'
               ' FROM songs JOIN artists'
               ' ON songs.artist_id = artists.artist_id'
-              ' WHERE title = (%s);')
-
+              ' WHERE title = (%s)'
+              ' AND name = (%s)'
+              ' AND duration = (%s);')
 
 	######################################################################
 	# QUERY LISTS

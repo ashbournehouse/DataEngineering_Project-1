@@ -17,7 +17,7 @@ Imports
 =======
 
   psycopg2 to handle interaction with PostgreSQL
-  sql_queries.py is part of the submission required by this porject.
+  sql_queries.py is part of the submission required by this project.
 
 """
 
@@ -206,7 +206,7 @@ def create_database():
 
     try:
         sparkify_connection = psycopg2.connect(
-            'host=127.0.0.1 dbname=studentdb user=student password=student'
+            f'host=127.0.0.1 dbname={database_name} user=student password=student'
             )
         logging.info(
             f'\n'

@@ -95,7 +95,7 @@ def main():
     """
     try:
         sparkify_connection = psycopg2.connect(
-            'host=127.0.0.1 dbname=studentdb user=student password=student'
+            'host=127.0.0.1 dbname=sparkify user=student password=student'
             )
         sparkify_connection.set_session(autocommit=True)
         logging.info(
@@ -145,7 +145,7 @@ def main():
 
     """
 
-    sql = f'SELECT * FROM songplays{LIMIT_STRING}'
+    sql = f'SELECT songplay_id, song_id, artist_id FROM songplays{LIMIT_STRING}'
     try:
         sparkify_cursor.execute(sql)
         songplays_rows_found = sparkify_cursor.rowcount

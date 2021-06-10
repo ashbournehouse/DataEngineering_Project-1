@@ -24,8 +24,9 @@ time_table_drop = f'DROP TABLE IF EXISTS time'
 	#     user_id, level, song_id, artist_id, session_id, location,
 	#     user_agent
 
-songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays '
-                            '(start_time timestamp NOT NULL, '
+songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays'
+                            '(songplay_id BIGSERIAL, '
+                            'start_time timestamp NOT NULL, '
                             'user_id int NOT NULL, '
                             'UNIQUE (start_time, user_id), '
                             'level varchar, '
@@ -101,10 +102,10 @@ time_table_create = (f'CREATE TABLE IF NOT EXISTS time'
 	#
 
 songplay_table_insert = ('INSERT INTO songplays'
-                        ' (start_time, user_id, level,'
+                        ' (songplay_id, start_time, user_id, level,'
                         ' song_id, artist_id, session_id, location,'
                         ' user_agent)'
-   											' VALUES (%s, %s, %s, %s, %s, %s, %s, %s);')
+   											' VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s);')
 
 user_table_insert = ('INSERT INTO users'
                     ' (user_id, first_name, last_name, gender, level)'

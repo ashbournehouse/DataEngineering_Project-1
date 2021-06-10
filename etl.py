@@ -1003,7 +1003,7 @@ def main():
     """
     try:
         sparkify_connection = psycopg2.connect(
-            'host=127.0.0.1 dbname=studentdb user=student password=student'
+            'host=127.0.0.1 dbname=sparkify user=student password=student'
             )
         sparkify_connection.set_session(autocommit=True)
         logging.debug(

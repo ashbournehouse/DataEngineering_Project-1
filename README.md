@@ -151,19 +151,19 @@ The [ETL](https://www.matillion.com/what-is-etl-the-ultimate-guide/) pipeline us
 
 > * Scan the data/song_data path and process each song files found:
 >
->> * Extract and order the fields required by songs table.
->> * Insert these as a row into the sparkify database table 'songs'
->>
+>> *  Extract and order the fields required by songs table.
+>> *  Insert these as a row into the sparkify database table 'songs'
+>
 >> * Extract and order the fields required by the artists table.
 >> * Insert these as a row into the sparkify database table 'artists'.
 >
 > * Scan the data/log_data path and process each log file found:
 >
 >> * Create a pandas dataframe and filter for 'nextsong' records.
->>
+>
 >> * Extract the timestamp data and transform to fill other time fields.
 >> * Insert as a row to the sparkify database table 'time'.
->>
+>
 >> * Extract the user data fields required by the users table.
 >> * Insert as a row to the sparkify database table 'users'.
 

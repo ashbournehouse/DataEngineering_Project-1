@@ -3,6 +3,7 @@
 ===================================================
 
   07/07/2021 - Reviewed for submission
+  07/07/2021 - TEST 6 added 2nd submission
 
   Standalone version of the tests offered in test.ipynb
 
@@ -158,7 +159,7 @@ def main():
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {songplays_rows_found}\n\n'
+            f'  Rows in sparkify_cursor: {songplays_rows_found}\n\n'
             f'First five songplays records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -192,7 +193,7 @@ def main():
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {users_rows_found}\n\n'
+            f'  Rows in sparkify_cursor: {users_rows_found}\n\n'
             f'First five users records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -226,7 +227,7 @@ def main():
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {songs_rows_found}\n\n'
+            f'  Rows in sparkify_cursor: {songs_rows_found}\n\n'
             f'First five songs records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -260,7 +261,7 @@ def main():
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {artists_rows_found}\n\n'
+            f'  Rows in sparkify_cursor: {artists_rows_found}\n\n'
             f'First five artists records found are: \n'
             f'{UNDERLINE_3}\n'
             )
@@ -294,8 +295,51 @@ def main():
         log_string = (
             f'\n'
             f'  Executed {sql}\n'
-            f'  Rows in sparify_cursor: {time_rows_found}\n\n'
+            f'  Rows in sparkify_cursor: {time_rows_found}\n\n'
             f'First five time records found are: \n'
+            f'{UNDERLINE_3}\n'
+            )
+        for record in sparkify_cursor:
+            log_string += (
+                f'{record}\n'
+                )
+        log_string += (f'{UNDERLINE_2}')
+        logging.info(log_string)
+    except psycopg2.Error as e:
+        logging.error(
+            f'\n'
+            f'  Something went wrong while trying to run the query: \n '
+            f'    {sql}\n'
+            f'  Error raised is: \n'
+            f'    {e}\n'
+            f'{UNDERLINE_2}'
+            )
+    """
+    TEST 6
+    ======
+      Ensure that only one record from 'songplays' has both
+        a valid songid and artist id as requested in first review
+
+    """
+
+    sql = (f'SELECT * FROM songplays'
+          f' WHERE song_id is NOT NULL'
+          f' AND artist_id is NOT NULL'
+          f' {LIMIT_STRING}'
+          )
+    try:
+        sparkify_cursor.execute(sql)
+        informative_songrows_found = sparkify_cursor.rowcount
+        log_string = (
+            f'\n'
+            f'=====================================================\n'
+            f'Ensure that only one record from "songplays" has both\n'
+            f'  a valid songid and artist id as requested in first \n'
+            f'  review\n'
+            f'=====================================================\n'
+            f'  Executed {sql}\n'
+            f'  Rows in sparkify_cursor: {time_rows_found}\n\n'
+            f'songplays records found are: \n'
             f'{UNDERLINE_3}\n'
             )
         for record in sparkify_cursor:
@@ -366,13 +410,15 @@ def main():
 
     logging.info(
             f'\n'
-            f'  Summary of tables\n'
+            f'  Summary of tests\n'
             f'  =================\n'
-            f'    Rows found in songplays table: {songplays_rows_found}\n'
-            f'    Rows found in users table: {users_rows_found}\n'
-            f'    Rows found in songs table: {songs_rows_found}\n'
-            f'    Rows found in artists table: {artists_rows_found}\n'
-            f'    Rows found in time table: {time_rows_found}\n'
+            f'   1 - Rows found in songplays table: {songplays_rows_found}\n'
+            f'   2 - Rows found in users table: {users_rows_found}\n'
+            f'   3 - Rows found in songs table: {songs_rows_found}\n'
+            f'   4 - Rows found in artists table: {artists_rows_found}\n'
+            f'   5 - Rows found in time table: {time_rows_found}\n'
+            f'   6 - Rows from songplays with non-null '
+            f'artist and song IDs: {informative_songrows_found}\n'
             )
 
     """

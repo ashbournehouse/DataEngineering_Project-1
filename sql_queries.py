@@ -1,5 +1,6 @@
 """
 07/07/2021 - Reviewed for submission
+07/07/2021 - ON CONFLICT clauses added for 2nd submission
 ######################################################################
 DROP TABLES
 ===========
@@ -26,7 +27,7 @@ CREATE TABLES
      user_agent
 """
 songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays'
-                            '(songplay_id BIGSERIAL, '
+                            '(songplay_id BIGSERIAL PRIMARY KEY, '
                             'start_time timestamp NOT NULL, '
                             'user_id int NOT NULL, '
                             'UNIQUE (start_time, user_id), '
@@ -42,7 +43,7 @@ songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays'
        gender, level
 """
 user_table_create = ('CREATE TABLE IF NOT EXISTS users'
-                        '(user_id int UNIQUE, '
+                        '(user_id int UNIQUE PRIMARY KEY, '
                         'first_name varchar, '
                         'last_name varchar, '
                         'gender varchar, '
@@ -55,7 +56,7 @@ user_table_create = ('CREATE TABLE IF NOT EXISTS users'
   NOTE: use of NUMERIC(precision, scale)
 """
 song_table_create = ('CREATE TABLE IF NOT EXISTS songs'
-                        '(song_id varchar UNIQUE, '
+                        '(song_id varchar UNIQUE PRIMARY KEY, '
                         'title varchar, '
                         'artist_id varchar, '
                         'year int, '
@@ -68,7 +69,7 @@ song_table_create = ('CREATE TABLE IF NOT EXISTS songs'
   NOTE: use of NUMERIC(precision, scale)
 """
 artist_table_create = ('CREATE TABLE IF NOT EXISTS artists'
-                          '(artist_id varchar UNIQUE, '
+                          '(artist_id varchar UNIQUE PRIMARY KEY, '
                           'name varchar, '
                           'location varchar, '
                           'latitude NUMERIC(8,5), '
@@ -79,7 +80,7 @@ artist_table_create = ('CREATE TABLE IF NOT EXISTS artists'
        year, weekday
 """
 time_table_create = (f'CREATE TABLE IF NOT EXISTS time'
-                         '(start_time timestamp UNIQUE, '
+                         '(start_time timestamp UNIQUE PRIMARY KEY, '
                          'hour int, '
                          'day int, '
                          'week int, '
@@ -95,25 +96,31 @@ songplay_table_insert = ('INSERT INTO songplays'
                         ' (songplay_id, start_time, user_id, level,'
                         ' song_id, artist_id, session_id, location,'
                         ' user_agent)'
-   											' VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s);')
+                        ' VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s)'
+                        ' ON CONFLICT (songplay_id) DO NOTHING;')
 
 user_table_insert = ('INSERT INTO users'
                     ' (user_id, first_name, last_name, gender, level)'
-                    ' VALUES (%s, %s, %s, %s, %s);')
+                    ' VALUES (%s, %s, %s, %s, %s)'
+                    ' ON CONFLICT (user_id)'
+                    ' DO UPDATE SET level = EXCLUDED.level;')
 
 song_table_insert = ('INSERT INTO songs'
                     ' (song_id, title, artist_id, year, duration)'
-                    ' VALUES (%s, %s, %s, %s, %s);')
+                    ' VALUES (%s, %s, %s, %s, %s)'
+                    ' ON CONFLICT (song_id) DO NOTHING;')
 
 artist_table_insert = ('INSERT INTO artists'
                       ' (artist_id, name, location, latitude,'
                       ' longitude)'
-                      ' VALUES (%s, %s, %s, %s, %s);')
+                      ' VALUES (%s, %s, %s, %s, %s)'
+                      ' ON CONFLICT (artist_id) DO NOTHING;')
 
 time_table_insert = ('INSERT INTO time'
                     ' (start_time, hour, day, week, month, year,'
                     ' weekday)'
-                    ' VALUES (%s, %s, %s, %s, %s, %s, %s);')
+                    ' VALUES (%s, %s, %s, %s, %s, %s, %s)'
+                    ' ON CONFLICT (start_time) DO NOTHING;')
 
 """
 FIND SONGS  (row.song, row.artist, row.length))

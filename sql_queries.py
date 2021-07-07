@@ -1,7 +1,10 @@
-	######################################################################
-	# DROP TABLES
-	# ===========
-	#
+"""
+07/07/2021 - Reviewed for submission
+######################################################################
+DROP TABLES
+===========
+"""
+
 songplay_table_drop = f'DROP TABLE IF EXISTS songplays'
 user_table_drop = f'DROP TABLE IF EXISTS users'
 song_table_drop = f'DROP TABLE IF EXISTS songs'
@@ -9,21 +12,19 @@ artist_table_drop = f'DROP TABLE IF EXISTS artists'
 time_table_drop = f'DROP TABLE IF EXISTS time'
 
 
+"""
+CREATE TABLES
+=============
 
-	######################################################################
-	# CREATE TABLES
-	# =============
-	#
-	#   NOTE: to prevent large numbers of duplicate entries being created
-	#     each time a log file is processed each table should have a
-	#     unique column, generally the existing ID field imported with
-	#     the other data from the song or log files.
-	#
-	######################################################################
-	# 01 - Table 'songplays' has fields: songplay_id, start_time,
-	#     user_id, level, song_id, artist_id, session_id, location,
-	#     user_agent
+   NOTE: to prevent large numbers of duplicate entries being created
+     each time a log file is processed each table should have a
+     unique column, generally the existing ID field imported with
+     the other data from the song or log files.
 
+01 - Table 'songplays' has fields: songplay_id, start_time,
+     user_id, level, song_id, artist_id, session_id, location,
+     user_agent
+"""
 songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays'
                             '(songplay_id BIGSERIAL, '
                             'start_time timestamp NOT NULL, '
@@ -36,12 +37,10 @@ songplay_table_create = ('CREATE TABLE IF NOT EXISTS songplays'
                             'location varchar, '
                             'user_agent text)'
                             )
-
-	######################################################################
-	# 02 - Table 'users' has fields: user_id, first_name, last_name,
-	#     gender, level
-	#
-
+"""
+02 - Table 'users' has fields: user_id, first_name, last_name,
+       gender, level
+"""
 user_table_create = ('CREATE TABLE IF NOT EXISTS users'
                         '(user_id int UNIQUE, '
                         'first_name varchar, '
@@ -49,14 +48,12 @@ user_table_create = ('CREATE TABLE IF NOT EXISTS users'
                         'gender varchar, '
                         'level varchar)'
                         )
+"""
+03 - Table 'songs' has fields: song_id, title, artist_id, year,
+       duration
 
-	######################################################################
-	# 03 - Table 'songs' has fields: song_id, title, artist_id, year,
-	#     duration
-	#
-	#   NOTE: use of NUMERIC(precision, scale)
-	#
-
+  NOTE: use of NUMERIC(precision, scale)
+"""
 song_table_create = ('CREATE TABLE IF NOT EXISTS songs'
                         '(song_id varchar UNIQUE, '
                         'title varchar, '
@@ -64,14 +61,12 @@ song_table_create = ('CREATE TABLE IF NOT EXISTS songs'
                         'year int, '
                         'duration NUMERIC(10,5))'
                         )
+"""
+04 - Table 'artists' has fields: artist_id, name, location,
+       latitude, longitude
 
-	######################################################################
-	# 04 - Table 'artists' has fields: artist_id, name, location,
-	#     latitude, longitude
-	#
-	#   NOTE: use of NUMERIC(precision, scale)
-	#
-
+  NOTE: use of NUMERIC(precision, scale)
+"""
 artist_table_create = ('CREATE TABLE IF NOT EXISTS artists'
                           '(artist_id varchar UNIQUE, '
                           'name varchar, '
@@ -79,12 +74,10 @@ artist_table_create = ('CREATE TABLE IF NOT EXISTS artists'
                           'latitude NUMERIC(8,5), '
                           'longitude NUMERIC(8,5))'
                           )
-
-	######################################################################
-	#   05 - Table 'time' has fields: start_time, hour, day, week, month,
-	#       year, weekday
-	#
-
+"""
+05 - Table 'time' has fields: start_time, hour, day, week, month,
+       year, weekday
+"""
 time_table_create = (f'CREATE TABLE IF NOT EXISTS time'
                          '(start_time timestamp UNIQUE, '
                          'hour int, '
@@ -94,13 +87,10 @@ time_table_create = (f'CREATE TABLE IF NOT EXISTS time'
                          'year int, '
                          'weekday varchar)'
                          )
-
-
-	######################################################################
-	# INSERT RECORDS
-	# ==============
-	#
-
+"""
+INSERT RECORDS
+==============
+"""
 songplay_table_insert = ('INSERT INTO songplays'
                         ' (songplay_id, start_time, user_id, level,'
                         ' song_id, artist_id, session_id, location,'
@@ -125,22 +115,20 @@ time_table_insert = ('INSERT INTO time'
                     ' weekday)'
                     ' VALUES (%s, %s, %s, %s, %s, %s, %s);')
 
-
-	######################################################################
-	# FIND SONGS  (row.song, row.artist, row.length))
-	# ==========
-	#
+"""
+FIND SONGS  (row.song, row.artist, row.length))
+==========
+"""
 song_select = ('SELECT songs.song_id, artists.artist_id'
               ' FROM songs JOIN artists'
               ' ON songs.artist_id = artists.artist_id'
               ' WHERE title = (%s)'
               ' AND name = (%s)'
               ' AND duration = (%s);')
-
-	######################################################################
-	# QUERY LISTS
-	# ===========
-	#
+"""
+QUERY LISTS
+===========
+"""
 create_table_queries = [songplay_table_create, user_table_create,
                          song_table_create, artist_table_create,
                          time_table_create]

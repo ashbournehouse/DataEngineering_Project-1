@@ -177,3 +177,59 @@ The [ETL](https://www.matillion.com/what-is-etl-the-ultimate-guide/) pipeline us
 >> **NOTE: Using the test/development dataset only one valid song_id, artist_id pair is returned in this process. For all other rows these fields are filled with 'None' values.**
 
 ***
+
+# Running the Scripts
+
+## postgreSQL
+
+To run these scripts locally from a clone of this repository requires a local installation of [PostgreSQL](https://www.postgresql.org). This must be set up with a database named 'studentdb' and a user named 'student' with password 'student'. This can be achieved in a number of ways, but the most accessible is probably to use 'psql', postgreSQL's own terminal based front end. 'psql' is described [here](https://www.postgresql.org/docs/current/app-psql.html), as follows:
+
+> *psql is a terminal-based front-end to PostgreSQL. It enables you to type in queries interactively, issue them to PostgreSQL, and see the query results. Alternatively, input can be from a file or from command line arguments. In addition, psql provides a number of meta-commands and various shell-like features to facilitate writing scripts and automating a wide variety of tasks.*
+
+The same web page also contains a 'usage' guide.
+
+
+If required, postgreSQL tutorials may be found [here](https://www.postgresql.org/docs/14/tutorial.html).
+
+## Python Scripts
+
+There are four Python scripts that form the substance of this project:
+
+### sql_queries.py
+
+This script is not run directly, but is used by the create_database and etl scripts. It simply contains the SQL queries required by the other scripts.
+
+
+### create_tables.py
+
+This script connects to the default database ('studentdb') on a local postgreSQL installation, then:
+
+> * Obtains a 'cursor' to allow submission of queries
+> * Perfoms a 'kill and rebuild' of the 'sparkify' database by:
+>>  * Droping the 'sparkify' database if it exists.
+>>  * Creating a new 'sparkify' database
+>>  * Closing the connection to the default database
+>>  * Obtaining a connection to the sparkify database
+>>  *  Obtaining a cursor to the sparkify database
+
+### etl.py
+
+This script extracts data from the songs and logs files then uses that data to populate the following tables:
+
+> * songs
+> * artists
+> * time
+> * users
+> * songplays
+
+### test.py
+
+This script prints out the first five records from each of the database tables created in the ETL process to check that the other scripts have worked properly.
+
+***
+
+The scripts should be run in a terminal window, in the following order.
+
+*  create_tables.py
+*  etl.py
+*  test.py

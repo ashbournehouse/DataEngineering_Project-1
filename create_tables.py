@@ -2,6 +2,8 @@
 21/05/2021 - Udacity Data Engineering - Create Tables Script
 ============================================================
 
+07/07/2021 - Reviewed for submission
+
   Standalone version create_tables script.
 
   'Kills and rebuilds' each of the five table definitions
@@ -62,7 +64,7 @@ def create_database():
 
      - Obtains a 'cursor' to allow submission of queries
      - Perfoms a 'kill and rebuild' of the 'sparkify' database by:
-       * Droping the 'sparkify' datbase if it exists.
+       * Droping the 'sparkify' database if it exists.
        * Creating a new 'sparkify' database
        * Closing the connection to the default database
        * Obtaining a connection to the sparkify database

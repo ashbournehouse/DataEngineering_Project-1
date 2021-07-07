@@ -2,7 +2,10 @@
 05/06/2021 - Udacity Data Engineering - Test Script
 ===================================================
 
+  07/07/2021 - Reviewed for submission
+
   Standalone version of the tests offered in test.ipynb
+
 
 """
 
@@ -53,8 +56,11 @@ Limit Constants
 
 """
 
-#LIMIT_STRING = ' LIMIT 5'
-LIMIT_STRING = ''
+LIMIT_STRING = ' LIMIT 5'
+    #
+    # For debugging, have an option not to limit the records returned
+    #
+#LIMIT_STRING = ''
 
 
 """

@@ -2,6 +2,8 @@
 21/05/2021 - Udacity Data Engineering - ETL Script
 ============================================================
 
+07/07/2021 - Reviewed for submission
+
   Standalone version etl script.
 
   (ETL = 'Extract, Transform, Load')
@@ -122,7 +124,7 @@ def process_song_file(cursor, filepath):
 
      - Obtains a 'cursor' to allow submission of queries
      - Perfoms a 'kill and rebuild' of the 'sparkify' database by:
-       * Droping the 'sparkify' datbase if it exists.
+       * Droping the 'sparkify' database if it exists.
        * Creating a new 'sparkify' database
        * Closing the connection to the default database
        * Obtaining a connection to the sparkify database
